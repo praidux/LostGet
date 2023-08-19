@@ -2,10 +2,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:lost_get/presentation_layer/widgets/authentication/authentication_widget.dart';
 import 'package:lost_get/presentation_layer/widgets/button.dart';
-
-import '../../../../constants/colors.dart';
+import '../../../widgets/authentication_widget.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -21,7 +19,6 @@ class _SignUpState extends State<SignUp> {
 
   void _togglePasswordView() {
     setState(() {
-      print("working");
       _isHidden = !_isHidden;
     });
   }
@@ -45,42 +42,34 @@ class _SignUpState extends State<SignUp> {
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               headingText(context, 'Sign Up'),
-              const SizedBox(
-                height: 36,
+              SizedBox(
+                height: 18.h,
               ),
-              getTextFields(
-                context,
-                'Your First Name',
-                'First Name',
-                'assets/icons/profile.svg',
+              // getTextFields(context, 'Your First Name', 'First Name',
+              //     'assets/icons/profile.svg', () {}),
+              // SizedBox(
+              //   height: 9.h,
+              // ),
+              // getTextFields(context, 'Your Last Name', 'Last Name',
+              //     'assets/icons/profile.svg', () {}),
+              // SizedBox(
+              //   height: 9.h,
+              // ),
+              // getTextFields(context, 'Your Email Address', 'E-mail',
+              //     'assets/icons/mail.svg', () {}),
+              SizedBox(
+                height: 9.h,
               ),
-              const SizedBox(
-                height: 18,
-              ),
-              getTextFields(context, 'Your Last Name', 'Last Name',
-                  'assets/icons/profile.svg'),
-              const SizedBox(
-                height: 18,
-              ),
-              getTextFields(
-                context,
-                'Your Email Address',
-                'E-mail',
-                'assets/icons/mail.svg',
-              ),
-              const SizedBox(
-                height: 18,
-              ),
-              getPasswordFields(
-                context,
-                'Your Password',
-                'Password',
-                'assets/icons/lock.svg',
-                _isHidden,
-                _togglePasswordView,
-              ),
-              const SizedBox(
-                height: 18,
+              // getPasswordFields(
+              //   context,
+              //   'Your Password',
+              //   'Password',
+              //   'assets/icons/lock.svg',
+              //   _isHidden,
+              //   _togglePasswordView,
+              // ),
+              SizedBox(
+                height: 9.h,
               ),
               RichText(
                 text: TextSpan(
@@ -105,26 +94,15 @@ class _SignUpState extends State<SignUp> {
                           recognizer: TapGestureRecognizer()..onTap = () {})
                     ]),
               ),
-              const SizedBox(
-                height: 61,
+              SizedBox(
+                height: 20.h,
               ),
               createButton(context, 'Register Now'),
               SizedBox(
-                height: 40.h,
+                height: 20.h,
               ),
-              Center(
-                child: RichText(
-                    text: TextSpan(
-                        text: 'Already signed up ? ',
-                        style: Theme.of(context).textTheme.bodySmall,
-                        children: const [
-                      TextSpan(
-                          text: "Login",
-                          style: TextStyle(
-                              color: AppColors.primaryColor,
-                              fontWeight: FontWeight.w600))
-                    ])),
-              ),
+              createRichTextForLoginSignUp(
+                  context, 'Already a member? ', 'Login', () {}),
             ]),
           ),
         ),
