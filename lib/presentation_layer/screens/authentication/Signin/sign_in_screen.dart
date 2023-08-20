@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:lost_get/constants/colors.dart';
+import 'package:lost_get/controller/Authentication/sign_in_controller.dart';
 import 'package:lost_get/presentation_layer/screens/Authentication/SignUp/sign_up_screen.dart';
 import 'package:lost_get/presentation_layer/widgets/button.dart';
 import 'package:lost_get/presentation_layer/widgets/password_field.dart';
@@ -20,6 +21,12 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final SignInBloc signinBloc = SignInBloc();
+  int loginButtonClickCount = 0;
+
+  void _handleLogin() {
+    loginButtonClickCount++;
+    SignInController(context, signinBloc).handleSignIn('email');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +88,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       height: 30.h,
                     ),
-                    createButton(context, 'Login'),
+                    CreateButton(
+                      title: 'Login',
+                      handleButton: _handleLogin,
+                    ),
                     SizedBox(
                       height: 29.h,
                     ),

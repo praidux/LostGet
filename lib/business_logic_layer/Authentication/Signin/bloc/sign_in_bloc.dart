@@ -18,13 +18,11 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
 
   FutureOr<void> emailOnChangedEvent(
       EmailOnChangedEvent event, Emitter<SignInState> emit) {
-    print("email: ${event.email}");
     emit(state.copyWith(email: event.email));
   }
 
   FutureOr<void> passwordOnChangedEvent(
       PasswordOnChangedEvent event, Emitter<SignInState> emit) {
-    print("password ${event.password}");
     emit(state.copyWith(password: event.password));
   }
 

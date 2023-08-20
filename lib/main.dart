@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lost_get/business_logic_layer/Authentication/Signin/bloc/sign_in_bloc.dart';
 import 'package:lost_get/constants/colors.dart';
 import 'package:lost_get/routes/app_routes.dart';
+import 'package:lost_get/routes/bloc_provider.dart';
 
 import 'firebase_options.dart';
 
@@ -27,9 +27,7 @@ class MyApp extends StatelessWidget {
         designSize: const Size(360, 360),
         builder: ((context, child) {
           return MultiBlocProvider(
-            providers: [
-              BlocProvider(create: ((context) => SignInBloc())),
-            ],
+            providers: AppBlocProvider.allBlocProvider,
             child: MaterialApp(
               debugShowCheckedModeBanner: false,
               title: 'LostGet',
