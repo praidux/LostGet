@@ -2,6 +2,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 // ignore: depend_on_referenced_packages
 import 'package:meta/meta.dart';
 
@@ -16,6 +17,7 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
     on<PasswordOnChangedEvent>(passwordOnChangedEvent);
     on<LoginButtonClickedEvent>(loginButtonClickedEvent);
     on<EyeToggleViewClickedEvent>(eyeToggleViewClickedEvent);
+    on<NavigateToEmailVerificationEvent>(navigateToEmailVerificationEvent);
   }
 
   FutureOr<void> firstNameOnChangedEvent(
@@ -50,5 +52,10 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
   FutureOr<void> eyeToggleViewClickedEvent(
       EyeToggleViewClickedEvent event, Emitter<SignUpState> emit) {
     emit(state.copyWith(isHidden: !state.isHidden));
+  }
+
+  FutureOr<void> navigateToEmailVerificationEvent(
+      NavigateToEmailVerificationEvent event, Emitter<SignUpState> emit) {
+    emit(NavigateToEmailVerificationState(event.userCredential));
   }
 }

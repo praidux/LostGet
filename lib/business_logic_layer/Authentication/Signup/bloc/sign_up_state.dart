@@ -36,3 +36,9 @@ class SignUpActionState extends SignUpState {}
 class RegisterNowButtonClickedState extends SignUpActionState {}
 
 class LoginButtonClickedState extends SignUpActionState {}
+
+class NavigateToEmailVerificationState extends SignUpActionState {
+  final UserCredential userCredential;
+
+  NavigateToEmailVerificationState(this.userCredential);
+}

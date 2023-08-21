@@ -28,18 +28,28 @@ Widget createRichTextForLoginSignUp(
   // final state = context.read<SignInBloc>().state;
   return Center(
     child: RichText(
-        text: TextSpan(
-            text: description,
-            style: Theme.of(context).textTheme.bodySmall,
-            children: [
-          TextSpan(
-              text: whereTo,
-              style: const TextStyle(
-                color: AppColors.primaryColor,
-                fontWeight: FontWeight.w600,
-                decoration: TextDecoration.underline,
+      text: TextSpan(
+        text: description,
+        style: Theme.of(context).textTheme.bodySmall,
+        children: [
+          WidgetSpan(
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => navigateTo(),
+                child: Text(
+                  whereTo,
+                  style: const TextStyle(
+                    color: AppColors.primaryColor,
+                    fontWeight: FontWeight.w600,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
               ),
-              recognizer: TapGestureRecognizer()..onTap = () => navigateTo()),
-        ])),
+            ),
+          ),
+        ],
+      ),
+    ),
   );
 }

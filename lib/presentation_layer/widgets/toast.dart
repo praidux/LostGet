@@ -5,8 +5,8 @@ import 'package:lost_get/constants/colors.dart';
 
 createToast(
     {required description,
-    Color backgroundColor = Colors.white,
-    Color textColor = Colors.black}) {
+    Color backgroundColor = AppColors.primaryColor,
+    Color textColor = Colors.white}) {
   Fluttertoast.showToast(
     msg: description,
     gravity: ToastGravity.BOTTOM,

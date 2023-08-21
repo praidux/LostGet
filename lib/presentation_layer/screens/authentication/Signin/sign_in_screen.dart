@@ -13,6 +13,7 @@ import '../../../widgets/authentication_widget.dart';
 import '../../../widgets/text_field.dart';
 
 class LoginScreen extends StatefulWidget {
+  static const routeName = '/login_screen';
   const LoginScreen({super.key});
 
   @override
@@ -82,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                     ),
                     SizedBox(
-                      height: 9.h,
+                      height: 3.h,
                     ),
                     createCheckboxNecessaryItems(context),
                     SizedBox(

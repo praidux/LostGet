@@ -30,3 +30,9 @@ class PasswordOnChangedEvent extends SignUpEvent {
 class LoginButtonClickedEvent extends SignUpEvent {}
 
 class EyeToggleViewClickedEvent extends SignUpEvent {}
+
+class NavigateToEmailVerificationEvent extends SignUpEvent {
+  final UserCredential userCredential;
+
+  NavigateToEmailVerificationEvent(this.userCredential);
+}

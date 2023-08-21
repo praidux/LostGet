@@ -44,17 +44,18 @@ class MyApp extends StatelessWidget {
                 useMaterial3: true,
                 canvasColor: Colors.white,
                 textTheme: TextTheme(
-                  titleLarge: GoogleFonts.montserrat(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 28.sp,
-                      color: AppColors.headingColor),
-                  titleSmall: GoogleFonts.montserrat(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14.sp,
-                      color: AppColors.headingColor),
-                  bodySmall: GoogleFonts.montserrat(
-                      fontSize: 14.sp, color: AppColors.placeHolderColor),
-                ),
+                    titleLarge: GoogleFonts.montserrat(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 28.sp,
+                        color: AppColors.headingColor),
+                    titleSmall: GoogleFonts.montserrat(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14.sp,
+                        color: AppColors.headingColor),
+                    bodySmall: GoogleFonts.montserrat(
+                        fontSize: 13.sp, color: AppColors.placeHolderColor),
+                    displaySmall: GoogleFonts.montserrat(
+                        fontSize: 16.sp, color: AppColors.headingColor)),
               ),
               onGenerateRoute: AppRouter().onGenerateRoute,
             ),

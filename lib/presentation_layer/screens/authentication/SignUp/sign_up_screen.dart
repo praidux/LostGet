@@ -1,9 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:lost_get/business_logic_layer/Authentication/Signup/bloc/sign_up_bloc.dart';
+import 'package:lost_get/controller/Authentication/sign_up_controller.dart';
+import 'package:lost_get/presentation_layer/screens/Authentication/SignUp/email_verification_screen.dart';
 import 'package:lost_get/presentation_layer/widgets/button.dart';
 import '../../../widgets/authentication_widget.dart';
 import '../../../widgets/password_field.dart';
@@ -29,6 +32,12 @@ class _SignUpState extends State<SignUp> {
         listener: (context, state) {
           if (state is LoginButtonClickedState) {
             Navigator.of(context).pop();
+          }
+          if (state is NavigateToEmailVerificationState) {
+            print("User is here ${state.userCredential.user!.email}");
+            UserCredential userCredential = state.userCredential;
+            Navigator.popAndPushNamed(context, EmailVerification.routeName,
+                arguments: userCredential);
           }
         },
         child: Scaffold(
@@ -130,7 +139,11 @@ class _SignUpState extends State<SignUp> {
                     SizedBox(
                       height: 20.h,
                     ),
-                    CreateButton(title: 'Register Now', handleButton: () {}),
+                    CreateButton(
+                        title: 'Register Now',
+                        handleButton: () {
+                          SignUpController(context, signUpBloc).handleSignUp();
+                        }),
                     SizedBox(
                       height: 20.h,
                     ),

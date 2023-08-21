@@ -3,7 +3,7 @@ import 'package:lost_get/constants/colors.dart';
 
 class CreateButton extends StatelessWidget {
   final String title;
-  final Function handleButton;
+  final VoidCallback? handleButton;
   const CreateButton({
     super.key,
     required this.title,
@@ -15,7 +15,7 @@ class CreateButton extends StatelessWidget {
     return SizedBox(
         width: MediaQuery.sizeOf(context).width,
         child: ElevatedButton(
-          onPressed: () => handleButton(),
+          onPressed: handleButton,
           style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryColor,
               foregroundColor: Colors.white,
