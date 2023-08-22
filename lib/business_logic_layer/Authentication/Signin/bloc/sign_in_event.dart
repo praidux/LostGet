@@ -18,3 +18,5 @@ class PasswordOnChangedEvent extends SignInEvent {
 class RegisterButtonClickedEvent extends SignInEvent {}
 
 class EyeToggleViewClickedEvent extends SignInEvent {}
+
+class LoginButtonClickedEvent extends SignInEvent {}

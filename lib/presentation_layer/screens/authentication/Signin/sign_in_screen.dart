@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:lost_get/constants/colors.dart';
+import 'package:lost_get/common/constants/colors.dart';
 import 'package:lost_get/controller/Authentication/sign_in_controller.dart';
 import 'package:lost_get/presentation_layer/screens/Authentication/SignUp/sign_up_screen.dart';
 import 'package:lost_get/presentation_layer/widgets/button.dart';
@@ -11,6 +11,7 @@ import 'package:lost_get/presentation_layer/widgets/password_field.dart';
 import '../../../../business_logic_layer/Authentication/Signin/bloc/sign_in_bloc.dart';
 import '../../../widgets/authentication_widget.dart';
 import '../../../widgets/text_field.dart';
+import '../../Dashboard/dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   static const routeName = '/login_screen';
@@ -37,6 +38,9 @@ class _LoginScreenState extends State<LoginScreen> {
         listener: (context, state) {
           if (state is RegisterButtonClickedState) {
             Navigator.pushNamed(context, SignUp.routeName);
+          }
+          if (state is LoginButtonClickedState) {
+            Navigator.of(context).pushReplacementNamed(Dashboard.routeName);
           }
         },
         bloc: signinBloc,

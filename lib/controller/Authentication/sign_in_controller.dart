@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:lost_get/common/constants/constant.dart';
+import 'package:lost_get/common/global.dart';
 import 'package:lost_get/presentation_layer/widgets/toast.dart';
 
 import '../../business_logic_layer/Authentication/Signin/bloc/sign_in_bloc.dart';
@@ -14,11 +16,9 @@ class SignInController {
     try {
       if (type == 'email') {
         final state = signInBloc.state;
+        bool isLoading = true;
         String emailAddress = state.email;
         String password = state.password;
-
-        print("Email is: $emailAddress");
-        print("Password is: $password");
 
         if (emailAddress.isEmpty) {
           createToast(description: 'Enter your email address to continue.');
@@ -29,19 +29,20 @@ class SignInController {
         try {
           final credentials = await FirebaseAuth.instance
               .signInWithEmailAndPassword(
-                  email: emailAddress, password: password);
+                  email: emailAddress, password: password)
+              .then((userCredential) {
+            final user = userCredential.user;
+            if (user != null && user.emailVerified) {
+              Global.storageService
+                  .setString(AppConstants.STORAGE_USER_TOKEN_KEY, "1234567");
+              signInBloc.add(LoginButtonClickedEvent());
+            }
+          });
 
           final user = credentials.user;
           if (user == null) {}
           if (!user!.emailVerified) {
             print("User not verfied");
-          }
-
-          if (user != null) {
-            print("Hello");
-            //
-          } else {
-            // error
           }
         } on FirebaseAuthException catch (e) {
           if (e.code == "user-not-found") {

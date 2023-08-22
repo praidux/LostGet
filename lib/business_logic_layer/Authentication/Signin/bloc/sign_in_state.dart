@@ -18,3 +18,5 @@ class SignInState {
 class SignInActionState extends SignInState {}
 
 class RegisterButtonClickedState extends SignInActionState {}
+
+class LoginButtonClickedState extends SignInActionState {}

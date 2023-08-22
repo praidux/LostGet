@@ -14,6 +14,7 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
     on<PasswordOnChangedEvent>(passwordOnChangedEvent);
     on<RegisterButtonClickedEvent>(registerButtonClickedEvent);
     on<EyeToggleViewClickedEvent>(eyeToggleViewClickedEvent);
+    on<LoginButtonClickedEvent>(loginButtonClickedEvent);
   }
 
   FutureOr<void> emailOnChangedEvent(
@@ -34,5 +35,10 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
   FutureOr<void> eyeToggleViewClickedEvent(
       EyeToggleViewClickedEvent event, Emitter<SignInState> emit) {
     emit(state.copyWith(isHidden: !state.isHidden));
+  }
+
+  FutureOr<void> loginButtonClickedEvent(
+      LoginButtonClickedEvent event, Emitter<SignInState> emit) {
+    emit(LoginButtonClickedState());
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-import '../../constants/colors.dart';
+import '../../common/constants/colors.dart';
 
 Widget headingText(context, String title) {
   return Text(
