@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lost_get/presentation_layer/screens/Add%20Report/My%20Reports/my_reports_screen.dart';
@@ -33,6 +34,7 @@ class _DashboardState extends State<Dashboard> {
         child: BlocBuilder<DashboardBloc, DashboardState>(
       bloc: dashboardBloc,
       builder: (context, state) {
+        print("UserLogged in Id: ${FirebaseAuth.instance.currentUser!.email}");
         return Scaffold(
           body: _fragments[state.index],
           bottomNavigationBar: NavBar(

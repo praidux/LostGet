@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lost_get/common/constants/welcome_constants.dart';
-import 'package:lost_get/presentation_layer/widgets/authentication_widget.dart';
+
 import 'package:lost_get/presentation_layer/widgets/button.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 

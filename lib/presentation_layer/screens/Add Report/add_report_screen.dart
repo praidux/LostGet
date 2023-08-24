@@ -16,6 +16,5 @@ class _AddReportScreenState extends State<AddReportScreen> {
         child: Text("Add Report"),
       ),
     ));
-    ;
   }
 }

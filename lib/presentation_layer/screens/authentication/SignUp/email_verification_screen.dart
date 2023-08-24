@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:lost_get/business_logic_layer/Authentication/Signup/bloc/sign_up_bloc.dart';
+
 import 'package:lost_get/presentation_layer/screens/Authentication/Signin/sign_in_screen.dart';
-import 'package:lost_get/presentation_layer/screens/Dashboard/dashboard_screen.dart';
+
 import 'package:lost_get/presentation_layer/widgets/button.dart';
 import 'package:lost_get/presentation_layer/widgets/toast.dart';
 
@@ -44,7 +44,6 @@ class _EmailVerificationState extends State<EmailVerification> {
   }
 
   void startCountdown() {
-    print("Remaining Seconds $_remainingSeconds");
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_remainingSeconds > 0) {
         _remainingSeconds--;

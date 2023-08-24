@@ -16,6 +16,5 @@ class _MyReportsScreenState extends State<MyReportsScreen> {
         child: Text("My Report"),
       ),
     ));
-    ;
   }
 }

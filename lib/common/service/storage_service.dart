@@ -21,9 +21,14 @@ class StorageService {
     return await _prefs.setString(key, value);
   }
 
-  bool getIsLoggedIn() {
-    return _prefs.getString(AppConstants.STORAGE_USER_TOKEN_KEY) == null
-        ? false
-        : true;
+  String? getTokenId() {
+    return _prefs.getString(AppConstants.STORAGE_USER_TOKEN_KEY);
+  }
+
+  bool removeTokenId() {
+    // ignore: unrelated_type_equality_checks
+    return _prefs.remove(AppConstants.STORAGE_USER_TOKEN_KEY) == true
+        ? true
+        : false;
   }
 }

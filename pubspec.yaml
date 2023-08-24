@@ -44,6 +44,9 @@ dependencies:
   fluttertoast: ^8.2.2
   smooth_page_indicator: ^1.1.0
   shared_preferences: ^2.2.0
+  dropdown_textfield: ^1.0.8
+  intl_phone_number_input: ^0.7.3+1
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:

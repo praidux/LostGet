@@ -16,7 +16,7 @@ class SignInController {
     try {
       if (type == 'email') {
         final state = signInBloc.state;
-        bool isLoading = true;
+
         String emailAddress = state.email;
         String password = state.password;
 
@@ -30,11 +30,12 @@ class SignInController {
           final credentials = await FirebaseAuth.instance
               .signInWithEmailAndPassword(
                   email: emailAddress, password: password)
-              .then((userCredential) {
+              .then((userCredential) async {
             final user = userCredential.user;
             if (user != null && user.emailVerified) {
-              Global.storageService
-                  .setString(AppConstants.STORAGE_USER_TOKEN_KEY, "1234567");
+              String? idToken = await userCredential.user!.getIdToken();
+              Global.storageService.setString(
+                  AppConstants.STORAGE_USER_TOKEN_KEY, idToken.toString());
               signInBloc.add(LoginButtonClickedEvent());
             }
           });
@@ -57,6 +58,28 @@ class SignInController {
       }
     } catch (e) {
       // pass
+    }
+  }
+
+  static Future<UserCredential?> autoSignIn() async {
+    String? idToken = Global.storageService.getTokenId();
+
+    if (idToken != null) {
+      try {
+        UserCredential userCredential =
+            await FirebaseAuth.instance.signInWithCustomToken(idToken);
+        return userCredential;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    return null;
+  }
+
+  Future<void> signOut() async {
+    if (Global.storageService.removeTokenId()) {
+      await FirebaseAuth.instance.signOut();
     }
   }
 }
