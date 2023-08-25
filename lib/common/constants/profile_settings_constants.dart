@@ -14,6 +14,16 @@ class ProfileSettingsConstants {
       'imgUrl': 'assets/icons/setting.svg',
       'title': 'Settings',
       'subtitle': 'Privacy and manage your account',
+    },
+    {
+      'imgUrl': 'assets/icons/share_feedback.svg',
+      'title': 'Share Feedback',
+      'subtitle': 'Share your valuable feedback with us',
+    },
+    {
+      'imgUrl': 'assets/icons/logout.svg',
+      'title': 'Log Out',
+      'subtitle': 'Log out your account',
     }
   ];
 }

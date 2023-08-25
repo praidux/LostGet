@@ -1,7 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lost_get/business_logic_layer/Authentication/Signup/bloc/sign_up_bloc.dart';
+import 'package:lost_get/models/user_profile.dart';
 import 'package:lost_get/presentation_layer/widgets/toast.dart';
+
+import '../../data_store_layer/repository/users_repository.dart';
 
 class SignUpController {
   final BuildContext context;
@@ -36,14 +39,28 @@ class SignUpController {
         password: password,
       );
       if (credentials.user != null) {
-        // User creation successful, you can access 'credentials.user' here.
-
         await credentials.user!.sendEmailVerification();
+
+        UserRepository userRepository = UserRepository();
+
+        UserProfile userProfile = UserProfile(
+            firstName: firstName,
+            lastName: lastName,
+            email: emailAddress,
+            isAdmin: false,
+            biography: "",
+            imgUrl: "",
+            phoneNumber: "",
+            dateOfBirth: "",
+            preferenceList: <String, dynamic>{},
+            gender: "");
+        await userRepository.createUserProfile(
+            credentials.user!.uid, userProfile);
 
         signUpBloc.add(NavigateToEmailVerificationEvent(credentials));
       } else {
         // User creation failed
-        print('User creation failed');
+        createToast(description: "Some error occurred");
       }
       // if (credentials != null) {}
     } on FirebaseAuthException catch (e) {

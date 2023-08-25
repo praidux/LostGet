@@ -1,12 +1,15 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lost_get/presentation_layer/screens/Authentication/Signin/sign_in_screen.dart';
 import 'package:lost_get/presentation_layer/screens/Profile%20Settings/edit_profile.dart';
 import 'package:lost_get/presentation_layer/widgets/profile_settings_widget.dart';
 
 import '../../../business_logic_layer/ProfileSettings/bloc/profile_settings_bloc.dart';
 import '../../../common/constants/profile_settings_constants.dart';
+import '../../../common/global.dart';
 
 class ProfileSettings extends StatefulWidget {
   const ProfileSettings({super.key});
@@ -74,8 +77,11 @@ class _ProfileSettingsState extends State<ProfileSettings> {
               ),
               Column(
                 children: ProfileSettingsConstants.profileListTile
-                    .map((e) => createListTile(e['title'] as String,
-                        e['subtitle'] as String, e['imgUrl'] as String))
+                    .map((e) => createListTile(
+                          e['title'] as String,
+                          e['subtitle'] as String,
+                          e['imgUrl'] as String,
+                        ))
                     .toList(),
               )
             ],

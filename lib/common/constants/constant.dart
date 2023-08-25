@@ -228,6 +228,3 @@ class AppConstants {
     "+998"
   ];
 }
-
-// /OutlineInputBorder(
-            //           borderRadius: BorderRadius.all(Radius.circular(5)))
