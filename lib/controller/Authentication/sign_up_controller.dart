@@ -13,16 +13,13 @@ class SignUpController {
   SignUpController(this.context, this.signUpBloc);
 
   Future<void> handleSignUp() async {
-    final firstName = signUpBloc.state.firstName;
-    final lastName = signUpBloc.state.lastName;
+    final fullName = signUpBloc.state.firstName;
+
     final emailAddress = signUpBloc.state.emailAddress;
     final password = signUpBloc.state.password;
 
-    if (firstName.isEmpty) {
-      createToast(description: 'Enter First Name to continue');
-      return;
-    } else if (lastName.isEmpty) {
-      createToast(description: 'Enter Last Name to continue');
+    if (fullName.isEmpty) {
+      createToast(description: 'Enter Full Name to continue');
       return;
     } else if (emailAddress.isEmpty) {
       createToast(description: "Enter Email Address to continue");
@@ -44,8 +41,7 @@ class SignUpController {
         UserRepository userRepository = UserRepository();
 
         UserProfile userProfile = UserProfile(
-            firstName: firstName,
-            lastName: lastName,
+            fullName: fullName,
             email: emailAddress,
             isAdmin: false,
             biography: "",

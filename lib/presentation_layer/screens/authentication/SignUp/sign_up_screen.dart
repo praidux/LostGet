@@ -61,22 +61,11 @@ class _SignUpState extends State<SignUp> {
                       height: 18.h,
                     ),
                     InputTextField(
-                      textHint: 'Your First Name',
-                      title: 'First Name',
+                      textHint: 'Your Full Name',
+                      title: 'Full Name',
                       imageUrl: 'assets/icons/profile.svg',
                       textOnChanged: (firstName) {
                         signUpBloc.add(FirstNameOnChangedEvent(firstName));
-                      },
-                    ),
-                    SizedBox(
-                      height: 9.h,
-                    ),
-                    InputTextField(
-                      textHint: 'Your Last Name',
-                      title: 'Last Name',
-                      imageUrl: 'assets/icons/profile.svg',
-                      textOnChanged: (lastName) {
-                        signUpBloc.add(LastNameOnChangedEvent(lastName));
                       },
                     ),
                     SizedBox(

@@ -1,18 +1,32 @@
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_textfield/dropdown_textfield.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:intl_phone_field/phone_number.dart';
 import 'package:lost_get/common/constants/colors.dart';
+import 'package:lost_get/common/constants/constant.dart';
+import 'package:lost_get/common/custom_icons/close_icons.dart';
+import 'package:lost_get/controller/Profile%20Settings/edit_profile_controller.dart';
 import 'package:lost_get/models/user_profile.dart';
 import 'package:lost_get/presentation_layer/widgets/button.dart';
 import 'package:lost_get/presentation_layer/widgets/toast.dart';
-
+import 'package:material_dialogs/widgets/buttons/icon_button.dart';
+import 'package:material_dialogs/widgets/buttons/icon_outline_button.dart';
+import '../../../business_logic_layer/EditProfile/ChangeProfile/bloc/change_profile_bloc.dart';
 import '../../../business_logic_layer/EditProfile/bloc/edit_profile_bloc.dart';
-import '../../../common/constants/constant.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:material_dialogs/material_dialogs.dart';
 
 class EditProfile extends StatefulWidget {
   static const routeName = '/edit_profile';
@@ -25,254 +39,492 @@ class EditProfile extends StatefulWidget {
 
 class _EditProfileState extends State<EditProfile> {
   EditProfileBloc editProfileBloc = EditProfileBloc();
+  ChangeProfileBloc changeProfileBloc = ChangeProfileBloc();
   final SingleValueDropDownController _genderController =
       SingleValueDropDownController();
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _biographyController = TextEditingController();
   final TextEditingController _dateOfBirthController = TextEditingController();
   final TextEditingController _emailAddressController = TextEditingController();
-
-  final FocusNode _phoneNumberFocusNode = FocusNode();
+  final TextEditingController _phoneNumberController = TextEditingController();
+  // final ImagePicker _picker = ImagePicker();
+  XFile? _pickedImage;
+  String? _uploadedImageUrl;
+  String? _oldImageUrl;
+  String? _completePhoneNumber;
 
   @override
   void initState() {
+    editProfileBloc.add(EditProfileLoadedEvent());
     super.initState();
-
-    _phoneNumberFocusNode.addListener(() {
-      editProfileBloc.add(
-          EditPhoneNumberFocusNodeClickedEvent(_phoneNumberFocusNode.hasFocus));
-    });
   }
 
-  @override
-  void dispose() {
-    _phoneNumberFocusNode.dispose();
-    super.dispose();
-  }
-
-  void _datePicker() {
-    showDatePicker(
+  Future<void> _datePicker() async {
+    await showDatePicker(
             context: context,
             initialDate: DateTime.now(),
             firstDate: DateTime(1950),
             lastDate: DateTime.now())
         .then((value) {
       if (value != null) {
-        editProfileBloc.add(
-            DateOfBirthOnChangedEvent(DateFormat("dd/MM/yyyy").format(value)));
+        _dateOfBirthController.text = DateFormat("dd/MM/yyyy").format(value);
       }
     });
   }
 
+  void _backPressedButton(context) {
+    Dialogs.materialDialog(
+        context: context,
+        msg: "You have unsaved changes. Are you sure that you want to close?",
+        msgStyle: GoogleFonts.roboto(
+          fontSize: 12.sp,
+          color: Colors.black,
+          fontWeight: FontWeight.normal,
+        ),
+        title: "Unsaved Changes",
+        actions: [
+          IconsButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            text: 'No',
+            color: Colors.grey,
+            iconData: Icons.cancel,
+            textStyle: const TextStyle(color: Colors.white),
+            iconColor: Colors.white,
+          ),
+          IconsButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+            text: 'Yes',
+            iconData: Icons.house,
+            color: AppColors.primaryColor,
+            textStyle: const TextStyle(color: Colors.white),
+            iconColor: Colors.white,
+          ),
+        ]);
+  }
+
   @override
   Widget build(BuildContext context) {
-    bool phoneNumberFocused = _phoneNumberFocusNode.hasFocus;
-    String? selectedDate;
-    editProfileBloc.add(FetchProfileDataEvent());
-    // Color borderColor = ;
+    final formKey = GlobalKey<FormState>();
+
     return Scaffold(
-      appBar: createAppBar(context, editProfileBloc),
-      body: SingleChildScrollView(
-        child: BlocConsumer(
-          bloc: editProfileBloc,
-          listenWhen: (previous, current) => current is EditProfileActionState,
-          listener: (context, state) {
-            if (state is BackButtonClickedState) {
-              Navigator.pop(context);
-            }
-          },
-          builder: (BuildContext context, state) {
-            if (state is ProfileDataLoadedState) {
-              setControllers(state.userProfile);
-              return Container(
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                child: Form(
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        createTitle(context, "Basic Information"),
-                        SizedBox(
-                          height: 6.h,
-                        ),
+      appBar: createAppBar(context, _backPressedButton),
+      body: BlocConsumer<EditProfileBloc, EditProfileState>(
+        bloc: editProfileBloc,
+        listenWhen: (previous, current) => current is EditProfileActionState,
+        listener: (context, state) {
+          if (state is SaveButtonClickedSuccessState) {
+            print("called here");
+            createToast(description: "Profile Updated Successfully!");
+          }
+        },
+        buildWhen: (previous, current) => current is! EditProfileActionState,
+        builder: (context, state) {
+          if (state is EditProfileLoadingState) {
+            return const SpinKitFadingCircle(
+              color: AppColors.primaryColor,
+              size: 50,
+            );
+          }
+          if (state is EditProfileErrorState) {
+            return createToast(description: state.errorMsg);
+          }
 
-                        Row(children: [
-                          createEditImage(context),
-                          SizedBox(
-                            width: 18.w,
-                          ),
-                          createBioFields(
-                              context, editProfileBloc, _fullNameController),
-                        ]),
+          if (state is EditProfileLoadedState) {
+            setControllers(state.userProfile);
 
-                        SizedBox(
-                          height: 11.h,
-                        ),
-                        createProfileFields(
-                            context,
-                            'Bio',
-                            TextInputType.text,
-                            (bio) => editProfileBloc
-                                .add(BiographyOnChangedEvent(bio))),
-                        SizedBox(
-                          height: 4.h,
-                        ),
-
-                        // DROP DOWN
-                        createMediumTitle("Gender"),
-                        SizedBox(
-                          height: 3.h,
-                        ),
-                        SizedBox(
-                            height: 20.h,
-                            child: DropDownTextField(
-                                controller: _genderController,
-                                initialValue: null,
-                                dropDownItemCount: 3,
-                                listTextStyle:
-                                    Theme.of(context).textTheme.bodySmall,
-                                textStyle:
-                                    Theme.of(context).textTheme.bodySmall,
-                                searchDecoration: const InputDecoration(
-                                    hintText: "Select Your Gender"),
-                                dropDownList: const [
-                                  DropDownValueModel(
-                                      name: 'Male', value: "Male"),
-                                  DropDownValueModel(
-                                      name: 'Female', value: "Female"),
-                                  DropDownValueModel(
-                                      name: 'Prefer Not To Say',
-                                      value: "Prefer Not To Say"),
-                                ],
-                                textFieldDecoration: const InputDecoration(
-                                    contentPadding: EdgeInsets.symmetric(
-                                        vertical: 7, horizontal: 12),
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(5)))),
-                                onChanged: (val) {})),
-                        SizedBox(
-                          height: 4.h,
-                        ),
-                        createMediumTitle("Date Of Birth"),
-                        SizedBox(
-                          height: 3.h,
-                        ),
-                        // Date of birth
-                        BlocBuilder<EditProfileBloc, EditProfileState>(
-                          bloc: editProfileBloc,
+            return SingleChildScrollView(
+                child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+              child: Form(
+                key: formKey,
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      createTitle(context, "Basic Information"),
+                      SizedBox(
+                        height: 6.h,
+                      ),
+                      Row(children: [
+                        BlocBuilder<ChangeProfileBloc, ChangeProfileState>(
+                          bloc: changeProfileBloc,
                           builder: (context, state) {
-                            return GestureDetector(
-                              onTap: () {
-                                _datePicker();
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 7, horizontal: 12),
-                                alignment: Alignment.centerLeft,
-                                width: 375.w,
-                                height: 20.h,
+                            if (state is ChangeProfileLoadingState) {
+                              Container(
+                                width: 110.w,
+                                height: 120,
                                 decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.black,
+                                    width: 2,
+                                  ),
+                                ),
+                                child: const SpinKitFadingCircle(
+                                  color: AppColors.primaryColor,
+                                  size: 50,
+                                ),
+                              );
+                            }
+                            if (state is ChangeProfileErrorState) {
+                              createToast(description: state.errorMsg);
+                            }
+                            if (state is ChangeProfileLoadedState) {
+                              print("i was here");
+                              _pickedImage = state.pickedImage;
+
+                              return Stack(children: [
+                                Container(
+                                    width: 110.w,
+                                    height: 120,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Colors.black,
+                                        width: 2,
+                                      ),
+                                      image: _pickedImage != null
+                                          ? DecorationImage(
+                                              fit: BoxFit.cover,
+                                              image: FileImage(
+                                                File(_pickedImage!.path),
+                                              ),
+                                            )
+                                          : const DecorationImage(
+                                              fit: BoxFit.cover,
+                                              image: NetworkImage(
+                                                "https://firebasestorage.googleapis.com/v0/b/lostget-faafe.appspot.com/o/defaultProfileImage.png?alt=media&token=15627898-29b2-47a1-b9cc-95c93a158cd1",
+                                              )),
+                                    )),
+                                Positioned(
+                                    bottom: 0,
+                                    left: 80,
+                                    child: IconButton(
+                                      icon: SvgPicture.asset(
+                                        'assets/icons/edit_profile.svg',
+                                        width: 13.w,
+                                        height: 13.h,
+                                      ),
+                                      onPressed: () {
+                                        changeProfileBloc.add(ChangeProfile());
+                                      },
+                                    ))
+                              ]);
+                            }
+                            print("2nd one called");
+                            return Stack(children: [
+                              Container(
+                                  width: 110.w,
+                                  height: 120,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
                                     border: Border.all(
-                                        color: Colors.black.withOpacity(0.5),
-                                        width: 1)),
-                                child: Text(
-                                    state.dateOfBirth.isEmpty
-                                        ? "DD/MM/YYYY"
-                                        : state.dateOfBirth,
-                                    style:
-                                        Theme.of(context).textTheme.bodySmall),
-                              ),
-                            );
+                                      color: Colors.black,
+                                      width: 2,
+                                    ),
+                                    image: _pickedImage != null
+                                        ? DecorationImage(
+                                            fit: BoxFit.cover,
+                                            image: FileImage(
+                                              File(_pickedImage!.path),
+                                            ),
+                                          )
+                                        : _uploadedImageUrl != null
+                                            ? DecorationImage(
+                                                image: NetworkImage(
+                                                    _uploadedImageUrl!),
+                                                fit: BoxFit.cover)
+                                            : const DecorationImage(
+                                                fit: BoxFit.cover,
+                                                image: NetworkImage(
+                                                  "https://firebasestorage.googleapis.com/v0/b/lostget-faafe.appspot.com/o/defaultProfileImage.png?alt=media&token=15627898-29b2-47a1-b9cc-95c93a158cd1",
+                                                )),
+                                  )),
+                              Positioned(
+                                  bottom: 0,
+                                  left: 80,
+                                  child: IconButton(
+                                    icon: SvgPicture.asset(
+                                      'assets/icons/edit_profile.svg',
+                                      width: 13.w,
+                                      height: 13.h,
+                                    ),
+                                    onPressed: () {
+                                      changeProfileBloc.add(ChangeProfile());
+                                    },
+                                  ))
+                            ]);
                           },
                         ),
+                        SizedBox(
+                          width: 18.w,
+                        ),
+                        createBioFields(
+                            context, editProfileBloc, _fullNameController),
+                      ]),
 
-                        SizedBox(
-                          height: 11.h,
-                        ),
-                        createTitle(context, 'Contact Information'),
-                        SizedBox(
-                          height: 3.h,
-                        ),
-                        createProfileFields(context, 'Email Address',
-                            TextInputType.emailAddress, (email) {
-                          editProfileBloc.add(EmailOnChangedEvent(email));
-                        }),
-                        SizedBox(
-                          height: 3.h,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            createMediumTitle("Phone Number"),
-                            SizedBox(
-                              height: 3.h,
-                            ),
-                            IntlPhoneField(
-                                dropdownTextStyle:
-                                    Theme.of(context).textTheme.bodySmall,
-                                onChanged: (phone) {
-                                  print(phone.completeNumber);
-                                },
-                                style: Theme.of(context).textTheme.bodySmall,
-                                decoration: const InputDecoration(
+                      SizedBox(
+                        height: 11.h,
+                      ),
+                      createProfileFields(context, 'Bio', TextInputType.text,
+                          _biographyController, (value) {}
+                          // editProfileBloc
+                          // .add(BiographyOnChangedEvent(bio))
+                          ),
+                      SizedBox(
+                        height: 4.h,
+                      ),
+
+                      // DROP DOWN
+                      createMediumTitle("Gender"),
+                      SizedBox(
+                        height: 3.h,
+                      ),
+                      SizedBox(
+                          height: 20.h,
+                          child: DropDownTextField(
+                              controller: _genderController,
+                              initialValue: null,
+                              dropDownItemCount: 3,
+                              listTextStyle:
+                                  Theme.of(context).textTheme.bodySmall,
+                              textStyle: Theme.of(context).textTheme.bodySmall,
+                              searchDecoration: const InputDecoration(
+                                  hintText: "Select Your Gender"),
+                              dropDownList: const [
+                                DropDownValueModel(name: 'Male', value: "Male"),
+                                DropDownValueModel(
+                                    name: 'Female', value: "Female"),
+                                DropDownValueModel(
+                                    name: 'Prefer Not To Say',
+                                    value: "Prefer Not To Say"),
+                              ],
+                              textFieldDecoration: const InputDecoration(
                                   contentPadding: EdgeInsets.symmetric(
                                       vertical: 7, horizontal: 12),
                                   border: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(5))),
-                                )),
-                            SizedBox(
-                              height: 8.h,
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(5)))),
+                              onChanged: (val) {})),
+                      SizedBox(
+                        height: 4.h,
+                      ),
+                      createMediumTitle("Date Of Birth"),
+                      SizedBox(
+                        height: 3.h,
+                      ),
+                      // Date of birth
+
+                      TextField(
+                        focusNode: AlwaysDisabledFocusNode(),
+                        controller: _dateOfBirthController,
+                        style: Theme.of(context).textTheme.bodySmall,
+                        decoration: const InputDecoration(
+                          contentPadding:
+                              EdgeInsets.symmetric(vertical: 7, horizontal: 12),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(4),
                             ),
-                            CreateButton(title: 'Save', handleButton: () {}),
-                          ],
+                          ),
+
+                          // floatingLabelBehavior: FloatingLabelBehavior.never,
                         ),
-                      ]),
-                ),
-              );
-            }
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          },
-        ),
+                        onTap: () {
+                          _datePicker();
+                        },
+                      ),
+
+                      SizedBox(
+                        height: 11.h,
+                      ),
+                      createTitle(context, 'Contact Information'),
+                      SizedBox(
+                        height: 3.h,
+                      ),
+                      createProfileFields(
+                          context,
+                          'Email Address',
+                          TextInputType.emailAddress,
+                          _emailAddressController, (email) {
+                        // editProfileBloc.add(EmailOnChangedEvent(email)
+                        // );
+                      }),
+                      SizedBox(
+                        height: 3.h,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          createMediumTitle("Phone Number"),
+                          SizedBox(
+                            height: 3.h,
+                          ),
+                          IntlPhoneField(
+                            controller: _phoneNumberController,
+                            onChanged: (value) =>
+                                _completePhoneNumber = value.completeNumber,
+                            initialCountryCode: getPhoneIsoCountry(
+                                state.userProfile.phoneNumber!),
+                            dropdownTextStyle:
+                                Theme.of(context).textTheme.bodySmall,
+                            style: Theme.of(context).textTheme.bodySmall,
+                            decoration: const InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(
+                                  vertical: 7, horizontal: 12),
+                              border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5))),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 8.h,
+                          ),
+                          CreateButton(
+                              title: 'Save',
+                              handleButton: () async {
+                                print(_dateOfBirthController.text);
+                                Map<String, dynamic> newProfileData = {
+                                  "fullName": _fullNameController.text,
+                                  "biography": _biographyController.text,
+                                  "gender":
+                                      _genderController.dropDownValue!.name,
+                                  "dateOfBirth": _dateOfBirthController.text,
+                                  "email": _emailAddressController.text,
+                                };
+                                print("Picked ${_pickedImage}");
+                                print("Old Image URL {$_oldImageUrl}");
+                                print(
+                                    "New Image URL ${state.userProfile.imgUrl}");
+                                if (_pickedImage != null &&
+                                    _oldImageUrl != state.userProfile.imgUrl) {
+                                  print("First");
+                                  newProfileData['imgUrl'] = _pickedImage;
+                                  _oldImageUrl = state.userProfile.imgUrl;
+                                  _pickedImage = null;
+                                }
+                                // } else if (_oldImageUrl != null &&
+                                //     _oldImageUrl != state.userProfile.imgUrl) {
+                                //   print("Second");
+                                //   _oldImageUrl = state.userProfile.imgUrl;
+                                //   _pickedImage = null;
+                                // }
+
+                                if (_completePhoneNumber != null) {
+                                  newProfileData['phoneNumber'] =
+                                      _completePhoneNumber;
+                                }
+
+                                var result = await EditProfileController()
+                                    .updateUserData(
+                                        newProfileData, state.userProfile);
+                                if (result == true) {
+                                  editProfileBloc
+                                      .add(SaveButtonClickedSuccessEvent());
+                                } else if (result == false) {
+                                  createToast(
+                                      description:
+                                          "Please update the fields to make changes.");
+                                }
+                              }),
+                        ],
+                      ),
+                    ]),
+              ),
+            ));
+          }
+          return Container();
+        },
       ),
     );
   }
 
-  void setControllers(UserProfile userProfile) {
-    _fullNameController.text =
-        "${userProfile.firstName} ${userProfile.lastName}";
-    _genderController.dropDownValue = DropDownValueModel(
-        name: userProfile.gender!, value: userProfile.gender!);
+  getPhoneIsoCountry(String phoneNumber) {
+    PhoneNumber number =
+        PhoneNumber.fromCompleteNumber(completeNumber: (phoneNumber));
+    return number.countryISOCode;
   }
-}
 
-Widget createEditImage(context) {
-  return Stack(children: [
-    const CircleAvatar(
-      backgroundColor: Colors.black,
-      radius: 62,
-      child: CircleAvatar(
-        radius: 60,
-        backgroundImage: NetworkImage(
-            'https://scontent.fisb6-1.fna.fbcdn.net/v/t39.30808-6/333859605_874574363647996_2923649837563353558_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=09cbfe&_nc_eui2=AeFuAT4XujtBnD61yMJL3CsyHBxx5bXf9iEcHHHltd_2ITszPjDhvLOTGeof3lBdXXrOZQAmWCIPozfNFDAvfsqs&_nc_ohc=-uk4AjWjRgMAX9aXlkD&_nc_oc=AQk_yZoaG-j27I5dJRXKBd8DnE-okvgWC5v0nhBc66S4s4qMKPaQuZEda4J3hhy8mnw&_nc_ht=scontent.fisb6-1.fna&oh=00_AfD7U6lAX-MNLiv8q-7ov1U2B3stj4Yb_DidLBFaSwX_RQ&oe=64EAF973'),
-      ),
-    ),
-    Positioned(
-        bottom: 0,
-        left: 80,
-        child: IconButton(
-          icon: SvgPicture.asset(
-            'assets/icons/edit_profile.svg',
-            width: 13.w,
-            height: 13.h,
-          ),
-          onPressed: () {},
-        ))
-  ]);
+  getPhoneCodeCountry(String phoneNumber) {
+    PhoneNumber number =
+        PhoneNumber.fromCompleteNumber(completeNumber: (phoneNumber));
+    return number.countryCode;
+  }
+
+  getPhoneNumber(String phoneNumber) {
+    PhoneNumber number =
+        PhoneNumber.fromCompleteNumber(completeNumber: (phoneNumber));
+    return number.number;
+  }
+
+  void setControllers(UserProfile userProfile) {
+    if (userProfile.fullName != "" && userProfile.dateOfBirth != null) {
+      _fullNameController.text = userProfile.fullName!;
+    } else {
+      _fullNameController.text = "";
+    }
+
+    if (userProfile.gender != "" && userProfile.gender != null) {
+      _genderController.dropDownValue = DropDownValueModel(
+          name: userProfile.gender!, value: userProfile.gender!);
+    }
+
+    if (userProfile.biography != "" && userProfile.biography != null) {
+      _biographyController.text = userProfile.biography!;
+    } else {
+      _biographyController.text = '';
+    }
+
+    if (userProfile.email != "" && userProfile.email != null) {
+      _emailAddressController.text = userProfile.email!;
+    } else {
+      _emailAddressController.text = '';
+    }
+
+    _emailAddressController.text =
+        userProfile.email != null ? userProfile.email! : "";
+
+    if (userProfile.dateOfBirth != "" && userProfile.dateOfBirth != null) {
+      _dateOfBirthController.text = userProfile.dateOfBirth!;
+    } else {
+      _dateOfBirthController.text = "DD/MM/YYYY";
+    }
+
+    if (userProfile.phoneNumber != "" && userProfile.phoneNumber != null) {
+      _phoneNumberController.text = getPhoneNumber(userProfile.phoneNumber!);
+    } else {
+      _phoneNumberController.text = '';
+    }
+
+    if (userProfile.imgUrl != "" && userProfile.imgUrl != null) {
+      _uploadedImageUrl = userProfile.imgUrl;
+    }
+  }
+
+  Widget createEditImage(context, Function handleImagePicker) {
+    return Stack(children: [
+      _pickedImage == null
+          ? Text('No Image Ex')
+          : Image.file(File(_pickedImage!.path)),
+      Positioned(
+          bottom: 0,
+          left: 80,
+          child: IconButton(
+            icon: SvgPicture.asset(
+              'assets/icons/edit_profile.svg',
+              width: 13.w,
+              height: 13.h,
+            ),
+            onPressed: () {
+              handleImagePicker();
+            },
+          ))
+    ]);
+  }
 }
 
 Widget createBioFields(context, EditProfileBloc editProfileBloc,
@@ -298,7 +550,7 @@ Widget createBioFields(context, EditProfileBloc editProfileBloc,
           controller: textEditingController,
           textAlign: TextAlign.start,
           onChanged: (fullName) {
-            editProfileBloc.add(FullNameOnChangedEvent(fullName));
+            // editProfileBloc.add(FullNameOnChangedEvent(fullName));
           },
           style: Theme.of(context).textTheme.bodySmall,
           keyboardType: TextInputType.text,
@@ -316,7 +568,7 @@ Widget createBioFields(context, EditProfileBloc editProfileBloc,
 }
 
 Widget createProfileFields(context, String title, TextInputType textInputType,
-    Function handleOnChange) {
+    TextEditingController textEditingController, Function handleOnChange) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -334,6 +586,7 @@ Widget createProfileFields(context, String title, TextInputType textInputType,
       SizedBox(
         height: 20.h,
         child: TextField(
+          controller: textEditingController,
           textAlign: TextAlign.start,
           onChanged: (value) {
             handleOnChange(value);
@@ -372,10 +625,10 @@ Widget createMediumTitle(String title) {
   );
 }
 
-PreferredSizeWidget? createAppBar(context, EditProfileBloc editProfileBloc) {
+PreferredSizeWidget? createAppBar(context, Function backPressedButton) {
   return AppBar(
     leading: IconButton(
-      onPressed: () => editProfileBloc.add(BackButtonClickedEvent()),
+      onPressed: () => backPressedButton(context),
       icon: SvgPicture.asset(
         'assets/icons/arrow-left.svg',
         width: 24,
@@ -400,147 +653,7 @@ PreferredSizeWidget? createAppBar(context, EditProfileBloc editProfileBloc) {
   );
 }
 
-Widget createDropdown(context, List<String> lists, InputBorder inputBorder,
-    String labelText, Function handleOnChange) {
-  return TextField(
-    style: Theme.of(context).textTheme.bodySmall,
-    maxLength: 4,
-    keyboardType: TextInputType.phone,
-    decoration: InputDecoration(
-      contentPadding: const EdgeInsets.only(bottom: 7, top: 7, left: 6),
-      border: inputBorder,
-      counterText: "",
-      suffixIcon: DropdownButtonFormField(
-        decoration: InputDecoration(
-          contentPadding:
-              const EdgeInsets.symmetric(vertical: 7, horizontal: 12),
-          border: inputBorder,
-          labelStyle: Theme.of(context).textTheme.bodySmall,
-        ),
-        onChanged: (value) {
-          handleOnChange(value);
-        },
-        items: lists.map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            child: Text(
-              value,
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-          );
-        }).toList(),
-      ),
-    ),
-  );
+class AlwaysDisabledFocusNode extends FocusNode {
+  @override
+  bool get hasFocus => false;
 }
-
-// TextField(
-//                 textAlign: TextAlign.start,
-//                 onChanged: (value) {},
-//                 style: Theme.of(context).textTheme.bodySmall,
-//                 decoration: InputDecoration(
-//                   labelText: "Select your gender",
-//                   contentPadding:
-//                       const EdgeInsets.symmetric(vertical: 7, horizontal: 12),
-//                   border: const OutlineInputBorder(
-//                       borderRadius: BorderRadius.all(Radius.circular(5))),
-//                   suffixIcon: DropdownButtonFormField(
-//                     decoration: const InputDecoration(
-//                       contentPadding:
-//                           EdgeInsets.symmetric(vertical: 7, horizontal: 12),
-//                       border: OutlineInputBorder(
-//                           borderRadius: BorderRadius.all(Radius.circular(5))),
-//                     ),
-//                     onChanged: (value) {},
-//                     items: AppConstants.GENDERS
-//                         .map<DropdownMenuItem<String>>((String value) {
-//                       return DropdownMenuItem<String>(
-//                         value: value,
-//                         child: Text(
-//                           value,
-//                           style: Theme.of(context).textTheme.bodySmall,
-//                         ),
-//                       );
-//                     }).toList(),
-//                   ),
-//                   // floatingLabelBehavior: FloatingLabelBehavior.never,
-//                 ),
-//               ),
-//             ),
-
-
-// createDropdown(
-//                   context,
-//                   AppConstants.GENDERS,
-//                   const OutlineInputBorder(
-//                     borderRadius: BorderRadius.all(
-//                       Radius.circular(5),
-//                     ),
-//                   ),
-//                   "Select A Gender",
-//                   (gender) => editProfileBloc.add(
-//                     GenderOnChangedEvent(gender),
-//                   ),
-//                 ),
-
-
-
-
-// createDropdown(
-//                                             context,
-//                                             AppConstants.COUNTRY_CODE,
-//                                             InputBorder.none,
-//                                             "+92", (countryCode) {
-//                                       editProfileBloc.add(
-//                                           CountryCodeOnChangedEvent(
-//                                               countryCode));
-//                                     })
-
-
-// BlocBuilder<EditProfileBloc, EditProfileState>(
-//                               bloc: editProfileBloc,
-//                               builder: (context, state) {
-//                                 if (state
-//                                     is EditPhoneNumberFocusNodeClickedState) {
-//                                   phoneNumberFocused = state.hasFocus;
-//                                 }
-
-//                                 return Container(
-//                                   height: 20.h,
-//                                   decoration: BoxDecoration(
-//                                       borderRadius: BorderRadius.circular(5),
-//                                       border: Border.all(
-//                                           color: phoneNumberFocused
-//                                               ? AppColors.primaryColor
-//                                               : Colors.black.withOpacity(0.5),
-//                                           width: phoneNumberFocused ? 2 : 1)),
-//                                   child: Row(children: [
-//                                     Expanded(
-//                                         child: IntlPhoneField(
-//                                       initialCountryCode: 'IN',
-//                                       onChanged: (phone) {
-//                                         print(phone.completeNumber);
-//                                       },
-//                                     )),
-//                                     Expanded(
-//                                       flex: 3,
-//                                       child: TextField(
-//                                         onChanged: (phoneNumber) =>
-//                                             editProfileBloc.add(
-//                                                 PhoneNumberOnChangedEvent(
-//                                                     phoneNumber)),
-//                                         style: Theme.of(context)
-//                                             .textTheme
-//                                             .bodySmall,
-//                                         keyboardType: TextInputType.phone,
-//                                         focusNode: _phoneNumberFocusNode,
-//                                         decoration: const InputDecoration(
-//                                           contentPadding: EdgeInsets.symmetric(
-//                                               vertical: 7, horizontal: 2),
-//                                           border: InputBorder.none,
-//                                         ),
-//                                       ),
-//                                     ),
-//                                   ]),
-//                                 );
-//                               }),

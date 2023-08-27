@@ -1,19 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserProfile {
-  final String? firstName;
-  final String? lastName;
+  final String? fullName;
   final String? email;
   final bool? isAdmin;
   final String? phoneNumber;
   final String? biography;
   final Map<String, dynamic>? preferenceList;
-  final String dateOfBirth;
+  final String? dateOfBirth;
   final String? imgUrl;
   final String? gender;
   const UserProfile({
-    required this.firstName,
-    required this.lastName,
+    required this.fullName,
     required this.email,
     required this.isAdmin,
     required this.phoneNumber,
@@ -27,8 +25,7 @@ class UserProfile {
   Map<String, dynamic> toMap() {
     return {
       'isAdmin': isAdmin,
-      'firstName': firstName,
-      'lastName': lastName,
+      'fullName': fullName,
       'email': email,
       'phoneNumber': phoneNumber,
       'biography': biography,
@@ -41,8 +38,7 @@ class UserProfile {
   factory UserProfile.fromSnapshot(DocumentSnapshot snapshot) {
     Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
     return UserProfile(
-        firstName: data['firstName'],
-        lastName: data['lastName'],
+        fullName: data['fullName'],
         biography: data['biography'],
         phoneNumber: data['phoneNumber'],
         preferenceList: data['preferenceList'] as Map<String, dynamic>,
