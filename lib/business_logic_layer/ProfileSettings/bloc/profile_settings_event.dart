@@ -4,3 +4,5 @@ part of 'profile_settings_bloc.dart';
 sealed class ProfileSettingsEvent {}
 
 class EditProfileButtonClickedEvent extends ProfileSettingsEvent {}
+
+class SignOutEvent extends ProfileSettingsEvent {}

@@ -7,6 +7,7 @@ import '../../data_store_layer/repository/users_repository.dart';
 import '../../models/user_profile.dart';
 
 class EditProfileController {
+  static String oldImgUrl = '';
   final EditProfileBloc? editProfileBloc;
   final ChangeProfileBloc? changeProfileBloc;
   final UserRepository _userRepo = UserRepository();
@@ -70,6 +71,7 @@ class EditProfileController {
       var generateImageUrl = await _userRepo.uploadProfileImage(imgUrl);
       print("Generated $generateImageUrl");
       newMap['imgUrl'] = generateImageUrl;
+      oldImgUrl = generateImageUrl;
     }
 
     if (newMap.isEmpty) {

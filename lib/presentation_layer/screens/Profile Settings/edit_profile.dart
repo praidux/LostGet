@@ -28,6 +28,8 @@ import '../../../business_logic_layer/EditProfile/bloc/edit_profile_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:material_dialogs/material_dialogs.dart';
 
+import '../../widgets/please_wait.dart';
+
 class EditProfile extends StatefulWidget {
   static const routeName = '/edit_profile';
 
@@ -55,7 +57,6 @@ class _EditProfileState extends State<EditProfile> {
 
   @override
   void initState() {
-    editProfileBloc.add(EditProfileLoadedEvent());
     super.initState();
   }
 
@@ -107,10 +108,38 @@ class _EditProfileState extends State<EditProfile> {
         ]);
   }
 
+  OverlayEntry? overlayEntry;
+
+  void showCustomLoadingDialog(BuildContext context) {
+    overlayEntry = OverlayEntry(
+      builder: (BuildContext context) {
+        return Positioned.fill(
+          child: Container(
+            color: Colors.transparent
+                .withOpacity(0.7), // Make the overlay transparent
+            child: const Center(
+              child: PleaseWaitDialog(),
+            ),
+          ),
+        );
+      },
+    );
+
+    Overlay.of(context).insert(overlayEntry!);
+  }
+
+  void hideCustomLoadingDialog(BuildContext context) {
+    if (overlayEntry != null) {
+      overlayEntry!.remove();
+      overlayEntry = null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final formKey = GlobalKey<FormState>();
 
+    editProfileBloc.add(EditProfileLoadEvent());
     return Scaffold(
       appBar: createAppBar(context, _backPressedButton),
       body: BlocConsumer<EditProfileBloc, EditProfileState>(
@@ -118,8 +147,17 @@ class _EditProfileState extends State<EditProfile> {
         listenWhen: (previous, current) => current is EditProfileActionState,
         listener: (context, state) {
           if (state is SaveButtonClickedSuccessState) {
-            print("called here");
+            hideCustomLoadingDialog(context);
             createToast(description: "Profile Updated Successfully!");
+            editProfileBloc.add(EditProfileLoadEvent());
+          }
+          if (state is SaveButtonClickedErrorState) {
+            hideCustomLoadingDialog(context);
+            createToast(description: state.description);
+          }
+          if (state is SaveButtonClickedLoadingState) {
+            print("here");
+            showCustomLoadingDialog(context);
           }
         },
         buildWhen: (previous, current) => current is! EditProfileActionState,
@@ -396,40 +434,43 @@ class _EditProfileState extends State<EditProfile> {
                                   "dateOfBirth": _dateOfBirthController.text,
                                   "email": _emailAddressController.text,
                                 };
-                                print("Picked ${_pickedImage}");
-                                print("Old Image URL {$_oldImageUrl}");
-                                print(
-                                    "New Image URL ${state.userProfile.imgUrl}");
-                                if (_pickedImage != null &&
-                                    _oldImageUrl != state.userProfile.imgUrl) {
-                                  print("First");
+
+                                if (_pickedImage != null) {
+                                  newProfileData['imgUrl'] = _pickedImage;
+                                  _oldImageUrl = state.userProfile.imgUrl;
+                                  _pickedImage = null;
+                                } else if (EditProfileController.oldImgUrl !=
+                                    state.userProfile.imgUrl) {
                                   newProfileData['imgUrl'] = _pickedImage;
                                   _oldImageUrl = state.userProfile.imgUrl;
                                   _pickedImage = null;
                                 }
-                                // } else if (_oldImageUrl != null &&
-                                //     _oldImageUrl != state.userProfile.imgUrl) {
-                                //   print("Second");
-                                //   _oldImageUrl = state.userProfile.imgUrl;
-                                //   _pickedImage = null;
-                                // }
 
                                 if (_completePhoneNumber != null) {
                                   newProfileData['phoneNumber'] =
                                       _completePhoneNumber;
                                 }
 
-                                var result = await EditProfileController()
-                                    .updateUserData(
-                                        newProfileData, state.userProfile);
-                                if (result == true) {
-                                  editProfileBloc
-                                      .add(SaveButtonClickedSuccessEvent());
-                                } else if (result == false) {
-                                  createToast(
-                                      description:
-                                          "Please update the fields to make changes.");
-                                }
+                                editProfileBloc.add(SaveButtonClickedEvent(
+                                    context,
+                                    newProfileData,
+                                    state.userProfile,
+                                    changeProfileBloc));
+
+                                // var result = await EditProfileController()
+                                //     .updateUserData(
+                                //         newProfileData, state.userProfile);
+                                // if (result == true) {
+                                //   _pickedImage = null;
+                                //   editProfileBloc
+                                //       .add(SaveButtonClickedSuccessEvent());
+                                //   changeProfileBloc
+                                //       .add(ChangeProfileInitialEvent());
+                                // } else if (result == false) {
+                                //   createToast(
+                                //       description:
+                                //           "Please update the fields to make changes.");
+                                // }
                               }),
                         ],
                       ),

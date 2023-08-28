@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lost_get/business_logic_layer/EditProfile/ChangeProfile/bloc/change_profile_bloc.dart';
 
 import 'package:lost_get/controller/Profile%20Settings/edit_profile_controller.dart';
 import 'package:meta/meta.dart';
@@ -12,15 +14,15 @@ import '../../../models/user_profile.dart';
 part 'edit_profile_event.dart';
 part 'edit_profile_state.dart';
 
-class EditProfileBloc extends Bloc<EditProfileLoadedEvent, EditProfileState> {
-  EditProfileBloc() : super(EditProfileLoadingState()) {
-    on<EditProfileLoadedEvent>(editProfileLoadedEvent);
+class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
+  EditProfileBloc() : super(EditProfileInitialState()) {
+    on<EditProfileLoadEvent>(editProfileLoadedEvent);
     on<FullNameControllerEvent>(fullNameControllerEvent);
-    on<SaveButtonClickedSuccessEvent>(saveButtonClickedEvent);
+    on<SaveButtonClickedEvent>(saveButtonClickedEvent);
   }
 
   FutureOr<void> editProfileLoadedEvent(
-      EditProfileLoadedEvent event, Emitter<EditProfileState> emit) async {
+      EditProfileEvent event, Emitter<EditProfileState> emit) async {
     emit(EditProfileLoadingState());
 
     try {
@@ -40,9 +42,17 @@ class EditProfileBloc extends Bloc<EditProfileLoadedEvent, EditProfileState> {
     emit(FullNameControllerState(event.fullName));
   }
 
-  FutureOr<void> saveButtonClickedEvent(
-      SaveButtonClickedSuccessEvent event, Emitter<EditProfileState> emit) {
-    print("summoned");
-    emit(SaveButtonClickedSuccessState());
+  Future<FutureOr<void>> saveButtonClickedEvent(
+      SaveButtonClickedEvent event, Emitter<EditProfileState> emit) async {
+    emit(SaveButtonClickedLoadingState());
+    var result = await EditProfileController()
+        .updateUserData(event.newProfileData, event.userProfile);
+    if (result == true) {
+      emit(SaveButtonClickedSuccessState());
+      event.changeProfileBloc.add(ChangeProfileInitialEvent());
+    } else {
+      emit(SaveButtonClickedErrorState(
+          "Please update the fields to make changes."));
+    }
   }
 }

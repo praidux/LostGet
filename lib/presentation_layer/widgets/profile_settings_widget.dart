@@ -3,9 +3,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-Widget createListTile(String title, String subtitle, String leadingIcon) {
+Widget createListTile(String title, String subtitle, String leadingIcon,
+    Function handleFunction) {
   return InkWell(
-    onTap: () {},
+    onTap: () {
+      handleFunction();
+    },
     child: Column(children: [
       ListTile(
         contentPadding: const EdgeInsets.symmetric(vertical: 8),

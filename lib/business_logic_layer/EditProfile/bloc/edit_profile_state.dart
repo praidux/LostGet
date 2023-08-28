@@ -6,6 +6,8 @@ sealed class EditProfileState extends Equatable {
   List<Object?> get props => [];
 }
 
+class EditProfileInitialState extends EditProfileState {}
+
 class EditProfileLoadingState extends EditProfileState {}
 
 class EditProfileActionState extends EditProfileState {}
@@ -36,4 +38,14 @@ class FullNameControllerState extends EditProfileState {
   List<Object?> get props => [fullName];
 }
 
-final class SaveButtonClickedSuccessState extends EditProfileActionState {}
+final class SaveButtonClickedSuccessState extends EditProfileActionState {
+  SaveButtonClickedSuccessState();
+}
+
+final class SaveButtonClickedLoadingState extends EditProfileActionState {}
+
+final class SaveButtonClickedErrorState extends EditProfileActionState {
+  final String description;
+
+  SaveButtonClickedErrorState(this.description);
+}

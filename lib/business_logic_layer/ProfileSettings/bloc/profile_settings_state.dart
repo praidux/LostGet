@@ -8,3 +8,5 @@ final class ProfileSettingsInitial extends ProfileSettingsState {}
 class ProfileSettingsActionState extends ProfileSettingsState {}
 
 class EditProfileButtonClickedState extends ProfileSettingsActionState {}
+
+class SignOutState extends ProfileSettingsState {}

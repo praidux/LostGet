@@ -27,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _handleLogin() {
     loginButtonClickCount++;
-    SignInController(context, signinBloc).handleSignIn('email');
+    SignInController().handleSignIn(context, 'email', signinBloc);
   }
 
   @override

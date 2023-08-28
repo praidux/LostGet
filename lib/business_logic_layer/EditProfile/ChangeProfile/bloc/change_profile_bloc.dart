@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:image_picker/image_picker.dart';
@@ -7,6 +9,7 @@ part 'change_profile_state.dart';
 
 class ChangeProfileBloc extends Bloc<ChangeProfileEvent, ChangeProfileState> {
   ChangeProfileBloc() : super(ChangeProfileInitialState()) {
+    on<ChangeProfileInitialEvent>(changeProfileInitialEvent);
     on<ChangeProfile>((event, emit) async {
       emit(ChangeProfileLoadingState());
       ImagePicker picker = ImagePicker();
@@ -20,5 +23,10 @@ class ChangeProfileBloc extends Bloc<ChangeProfileEvent, ChangeProfileState> {
         emit(const ChangeProfileErrorState("Error Occurred"));
       }
     });
+  }
+
+  FutureOr<void> changeProfileInitialEvent(
+      ChangeProfileInitialEvent event, Emitter<ChangeProfileState> emit) {
+    emit(ChangeProfileInitialState());
   }
 }

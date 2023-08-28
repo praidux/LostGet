@@ -7,4 +7,5 @@ sealed class ChangeProfileEvent extends Equatable {
   List<Object> get props => [];
 }
 
+class ChangeProfileInitialEvent extends ChangeProfileEvent {}
 class ChangeProfile extends ChangeProfileEvent {}

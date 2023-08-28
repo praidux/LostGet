@@ -7,12 +7,7 @@ import 'package:lost_get/presentation_layer/widgets/toast.dart';
 import '../../business_logic_layer/Authentication/Signin/bloc/sign_in_bloc.dart';
 
 class SignInController {
-  final BuildContext context;
-  final SignInBloc signInBloc;
-
-  SignInController(this.context, this.signInBloc);
-
-  Future<void> handleSignIn(String type) async {
+  Future<void> handleSignIn(context, String type, SignInBloc signInBloc) async {
     try {
       if (type == 'email') {
         final state = signInBloc.state;
