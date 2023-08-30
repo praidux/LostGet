@@ -2,8 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lost_get/presentation_layer/screens/Profile%20Settings/edit_profile.dart';
+
+import 'package:lost_get/business_logic_layer/ThemeMode/change_theme_mode.dart';
+import 'package:lost_get/presentation_layer/screens/Authentication/Signin/sign_in_screen.dart';
+import 'package:lost_get/presentation_layer/screens/Profile%20Settings/EditProfile/edit_profile.dart';
+import 'package:lost_get/presentation_layer/screens/Profile%20Settings/Settings/settings_screen.dart';
+import 'package:lost_get/presentation_layer/widgets/alert_dialog.dart';
 import 'package:lost_get/presentation_layer/widgets/profile_settings_widget.dart';
+import 'package:lost_get/presentation_layer/widgets/toast.dart';
+import 'package:provider/provider.dart';
 
 import '../../../business_logic_layer/ProfileSettings/bloc/profile_settings_bloc.dart';
 import '../../../common/constants/profile_settings_constants.dart';
@@ -17,76 +24,212 @@ class ProfileSettings extends StatefulWidget {
 
 class _ProfileSettingsState extends State<ProfileSettings> {
   ProfileSettingsBloc profileSettingsBloc = ProfileSettingsBloc();
+  String? _uploadedImageUrl;
+  String? _username;
+
+  @override
+  void initState() {
+    profileSettingsBloc.add(UserProfileLoadingEvent());
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     List<Map<String, dynamic>> profileList =
-        ProfileSettingsConstants(profileSettingsBloc).getProfileList();
+        ProfileSettingsConstants(profileSettingsBloc: profileSettingsBloc)
+            .getProfileList();
+
     return BlocListener<ProfileSettingsBloc, ProfileSettingsState>(
       bloc: profileSettingsBloc,
       listener: (context, state) {
+        if (state is SettingsButtonClickedState) {
+          Navigator.pushNamed(context, EditProfileSettings.routeName);
+        }
+
         if (state is EditProfileButtonClickedState) {
-          Navigator.pushNamed(context, EditProfile.routeName);
+          Navigator.pushNamed(context, EditProfile.routeName).then(
+              (value) => profileSettingsBloc.add(UserProfileLoadingEvent()));
+        }
+
+        if (state is SignOutAlertDialogState) {
+          alertDialog(
+            context,
+            "Are you sure? You want to log out?",
+            "Log Out",
+            "No",
+            "Log Out",
+            () => Navigator.pop(context),
+            () => profileSettingsBloc.add(SignOutEvent()),
+          );
+        }
+
+        if (state is SignOutLoadingSuccessState) {
+          createToast(description: "Logged out successfully!");
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginScreen()),
+              (route) => false);
         }
       },
-      child: SafeArea(
-          child: Scaffold(
-        body: Container(
-          margin: const EdgeInsets.only(left: 18, right: 18, top: 14),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  const CircleAvatar(
-                    backgroundColor: Colors.black,
-                    radius: 62,
-                    child: CircleAvatar(
-                      radius: 60,
-                      backgroundImage: NetworkImage(
-                          'https://scontent.fisb6-1.fna.fbcdn.net/v/t39.30808-6/333859605_874574363647996_2923649837563353558_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=09cbfe&_nc_eui2=AeFuAT4XujtBnD61yMJL3CsyHBxx5bXf9iEcHHHltd_2ITszPjDhvLOTGeof3lBdXXrOZQAmWCIPozfNFDAvfsqs&_nc_ohc=-uk4AjWjRgMAX9aXlkD&_nc_oc=AQk_yZoaG-j27I5dJRXKBd8DnE-okvgWC5v0nhBc66S4s4qMKPaQuZEda4J3hhy8mnw&_nc_ht=scontent.fisb6-1.fna&oh=00_AfD7U6lAX-MNLiv8q-7ov1U2B3stj4Yb_DidLBFaSwX_RQ&oe=64EAF973'),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 18.w,
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Syed Danish",
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                      InkWell(
-                        onTap: () => profileSettingsBloc
-                            .add(EditProfileButtonClickedEvent()),
-                        child: Text("View and edit profile",
-                            style: GoogleFonts.roboto(
-                              color: Colors.black,
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w700,
-                              decoration: TextDecoration.underline,
+      child: Scaffold(
+        body: SafeArea(
+          child: Container(
+            margin: const EdgeInsets.only(left: 18, right: 18, top: 14),
+            child: Column(
+              children: [
+                BlocBuilder<ProfileSettingsBloc, ProfileSettingsState>(
+                  bloc: profileSettingsBloc,
+                  builder: (context, state) {
+                    if (state is UserProfileLoadingState) {}
+
+                    if (state is UserProfileErrorState) {
+                      createToast(description: state.msg);
+                    }
+
+                    if (state is UserProfileLoadedState) {
+                      _uploadedImageUrl = state.userProfile.imgUrl;
+                      _username = state.userProfile.fullName;
+                      return Row(children: [
+                        Container(
+                            width: 110.w,
+                            height: 120,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.black,
+                                width: 2,
+                              ),
+                              image: _uploadedImageUrl != null &&
+                                      _uploadedImageUrl != ""
+                                  ? DecorationImage(
+                                      image: NetworkImage(_uploadedImageUrl!),
+                                      fit: BoxFit.cover)
+                                  : const DecorationImage(
+                                      fit: BoxFit.cover,
+                                      image: NetworkImage(
+                                        "https://firebasestorage.googleapis.com/v0/b/lostget-faafe.appspot.com/o/defaultProfileImage.png?alt=media&token=15627898-29b2-47a1-b9cc-95c93a158cd1",
+                                      )),
                             )),
-                      )
-                    ],
-                  )
-                ],
-              ),
-              SizedBox(
-                height: 15.h,
-              ),
-              Column(
-                children: profileList
-                    .map((e) => createListTile(
-                        e['title'] as String,
-                        e['subtitle'] as String,
-                        e['imgUrl'] as String,
-                        e['handleFunction'] as Function))
-                    .toList(),
-              )
-            ],
+                        SizedBox(
+                          width: 18.w,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _username != null && _username != ""
+                                  ? _username.toString()
+                                  : "",
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                            Consumer(
+                              builder:
+                                  (context, ChangeThemeMode value, child) =>
+                                      InkWell(
+                                onTap: () => profileSettingsBloc
+                                    .add(EditProfileButtonClickedEvent()),
+                                child: Text("View and edit profile",
+                                    style: GoogleFonts.roboto(
+                                      color: value.isDarkMode
+                                          ? Colors.white
+                                          : Colors.black,
+                                      fontSize: 12.sp,
+                                      fontWeight: value.isDyslexia
+                                          ? FontWeight.w900
+                                          : FontWeight.w700,
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: value.isDarkMode
+                                          ? Colors.white
+                                          : Colors.black,
+                                    )),
+                              ),
+                            )
+                          ],
+                        ),
+                      ]);
+                    }
+                    return Row(children: [
+                      Container(
+                        width: 110.w,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.black,
+                            width: 2,
+                          ),
+                          image: _uploadedImageUrl != null &&
+                                  _uploadedImageUrl != ""
+                              ? DecorationImage(
+                                  image: NetworkImage(_uploadedImageUrl!),
+                                  fit: BoxFit.cover)
+                              : const DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: NetworkImage(
+                                    "https://firebasestorage.googleapis.com/v0/b/lostget-faafe.appspot.com/o/defaultProfileImage.png?alt=media&token=15627898-29b2-47a1-b9cc-95c93a158cd1",
+                                  )),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 18.w,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _username != null && _username != ""
+                                ? _username.toString()
+                                : "",
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          Consumer(
+                            builder: (context, ChangeThemeMode value, child) =>
+                                InkWell(
+                              onTap: () => profileSettingsBloc
+                                  .add(EditProfileButtonClickedEvent()),
+                              child: Text("View and edit profile",
+                                  style: GoogleFonts.roboto(
+                                    color: value.isDarkMode
+                                        ? Colors.white
+                                        : Colors.black,
+                                    fontSize: 12.sp,
+                                    fontWeight: value.isDyslexia
+                                        ? FontWeight.w900
+                                        : FontWeight.w700,
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: value.isDarkMode
+                                        ? Colors.white
+                                        : Colors.black,
+                                  )),
+                            ),
+                          )
+                        ],
+                      ),
+                    ]);
+                  },
+                ),
+                SizedBox(
+                  height: 15.h,
+                ),
+                Consumer(
+                    builder: (context, ChangeThemeMode value, child) => Column(
+                          children: profileList
+                              .map(
+                                (e) => createListTile(
+                                    context,
+                                    e['title'] as String,
+                                    e['subtitle'] as String,
+                                    e['imgUrl'] as String,
+                                    e['handleFunction'] as Function,
+                                    value.isDarkMode),
+                              )
+                              .toList(),
+                        ))
+              ],
+            ),
           ),
         ),
-      )),
+      ),
     );
   }
 }

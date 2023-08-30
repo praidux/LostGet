@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lost_get/business_logic_layer/ThemeMode/change_theme_mode.dart';
 import 'package:lost_get/common/constants/welcome_constants.dart';
 
 import 'package:lost_get/presentation_layer/widgets/button.dart';
+import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../../business_logic_layer/Onboard/bloc/onboard_bloc.dart';
@@ -38,56 +40,54 @@ class _OnboardScreenState extends State<OnboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: BlocConsumer<OnboardBloc, OnboardState>(
-        bloc: onboardBloc,
-        listener: (context, state) {
-          if (state is GetStartedButtonClickedActionState) {
-            Global.storageService
-                .setBool(AppConstants.STORAGE_DEVICE_OPEN_FIRST_TIME, true);
-            Navigator.pushReplacementNamed(context, LoginScreen.routeName);
-          }
-        },
-        builder: (context, state) {
-          return Scaffold(
-            body: Stack(alignment: Alignment.center, children: [
-              PageView(
-                controller: pageController,
-                onPageChanged: (index) {
-                  state.page = index;
-                  onboardBloc.add(ChangePageDotIndicatorEvent());
-                },
-                children: WelcomeConstants.welcomeConstants
-                    .map(
-                      (e) => _onboardPages(
-                        e['id'] as int,
-                        context,
-                        e['imgUrl'] as String,
-                        e['title'] as String,
-                        e['subtitle'] as String,
-                        e['btnName'] as String,
-                        handleButton,
-                      ),
-                    )
-                    .toList(),
+    return BlocConsumer<OnboardBloc, OnboardState>(
+      bloc: onboardBloc,
+      listener: (context, state) {
+        if (state is GetStartedButtonClickedActionState) {
+          Global.storageService
+              .setBool(AppConstants.STORAGE_DEVICE_OPEN_FIRST_TIME, true);
+          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+        }
+      },
+      builder: (context, state) {
+        return Scaffold(
+          body: Stack(alignment: Alignment.center, children: [
+            PageView(
+              controller: pageController,
+              onPageChanged: (index) {
+                state.page = index;
+                onboardBloc.add(ChangePageDotIndicatorEvent());
+              },
+              children: WelcomeConstants.welcomeConstants
+                  .map(
+                    (e) => _onboardPages(
+                      e['id'] as int,
+                      context,
+                      e['imgUrl'] as String,
+                      e['title'] as String,
+                      e['subtitle'] as String,
+                      e['btnName'] as String,
+                      handleButton,
+                    ),
+                  )
+                  .toList(),
+            ),
+            Positioned(
+              bottom: 30.h,
+              child: AnimatedSmoothIndicator(
+                activeIndex: state.page,
+                count: 3,
+                effect: const ExpandingDotsEffect(
+                    activeDotColor: AppColors.primaryColor,
+                    radius: 20,
+                    dotWidth: 10,
+                    dotHeight: 10,
+                    expansionFactor: 2),
               ),
-              Positioned(
-                bottom: 30.h,
-                child: AnimatedSmoothIndicator(
-                  activeIndex: state.page,
-                  count: 3,
-                  effect: const ExpandingDotsEffect(
-                      activeDotColor: AppColors.primaryColor,
-                      radius: 20,
-                      dotWidth: 10,
-                      dotHeight: 10,
-                      expansionFactor: 2),
-                ),
-              )
-            ]),
-          );
-        },
-      ),
+            )
+          ]),
+        );
+      },
     );
   }
 }
@@ -114,14 +114,16 @@ Widget _onboardPages(
       SizedBox(
         height: 40.h,
       ),
-      Text(
-        title,
-        style: GoogleFonts.montserrat(
-          fontWeight: FontWeight.w700,
-          fontSize: 20.sp,
-          color: AppColors.headingColor,
+      Consumer(
+        builder: (context, ChangeThemeMode value, child) => Text(
+          title,
+          style: GoogleFonts.montserrat(
+            fontWeight: value.isDyslexia ? FontWeight.w900 : FontWeight.w700,
+            fontSize: 20.sp,
+            color: AppColors.headingColor,
+          ),
+          textAlign: TextAlign.center,
         ),
-        textAlign: TextAlign.center,
       ),
       SizedBox(
         height: 3.h,

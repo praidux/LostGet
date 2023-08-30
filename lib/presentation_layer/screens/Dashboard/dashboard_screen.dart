@@ -30,11 +30,9 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: BlocBuilder<DashboardBloc, DashboardState>(
+    return BlocBuilder<DashboardBloc, DashboardState>(
       bloc: dashboardBloc,
       builder: (context, state) {
-        print("UserLogged in Id: ${FirebaseAuth.instance.currentUser!.email}");
         return Scaffold(
           body: _fragments[state.index],
           bottomNavigationBar: NavBar(
@@ -42,6 +40,6 @@ class _DashboardState extends State<Dashboard> {
           ),
         );
       },
-    ));
+    );
   }
 }

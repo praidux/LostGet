@@ -25,10 +25,11 @@ class StorageService {
     return _prefs.getString(AppConstants.STORAGE_USER_TOKEN_KEY);
   }
 
-  bool removeTokenId() {
+  Future<bool> removeTokenId() async {
     // ignore: unrelated_type_equality_checks
-    return _prefs.remove(AppConstants.STORAGE_USER_TOKEN_KEY) == true
-        ? true
-        : false;
+    print("removed");
+    bool tokenRemoved =
+        await _prefs.remove(AppConstants.STORAGE_USER_TOKEN_KEY);
+    return tokenRemoved == true ? true : false;
   }
 }

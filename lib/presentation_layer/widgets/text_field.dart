@@ -47,6 +47,7 @@ class InputTextField extends StatelessWidget {
             border: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(4))),
             hintText: textHint,
+            hintStyle: Theme.of(context).textTheme.bodySmall,
 
             // floatingLabelBehavior: FloatingLabelBehavior.never,
           ),

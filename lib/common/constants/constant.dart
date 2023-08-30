@@ -8,6 +8,8 @@ class AppConstants {
 
   static const List<String> GENDERS = ['Male', 'Female', 'Prefer Not To Say'];
 
+  static bool isDark = false;
+
   static const List<String> COUNTRY_CODE = [
     "+1",
     "+20",

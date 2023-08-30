@@ -1,38 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 
-Widget createListTile(String title, String subtitle, String leadingIcon,
-    Function handleFunction) {
-  return InkWell(
+
+Widget createListTile(context, String title, String subtitle,
+    String? leadingIcon, Function handleFunction, bool isDark) {
+  ColorFilter? colorFilter =
+      isDark ? const ColorFilter.mode(Colors.white, BlendMode.srcIn) : null;
+  return GestureDetector(
     onTap: () {
       handleFunction();
     },
     child: Column(children: [
       ListTile(
         contentPadding: const EdgeInsets.symmetric(vertical: 8),
-        leading: SvgPicture.asset(leadingIcon),
+        leading: leadingIcon != null ? SvgPicture.asset(leadingIcon) : null,
         title: Text(
           title,
-          style: GoogleFonts.roboto(
-            color: Colors.black,
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w700,
-          ),
+          style: Theme.of(context).textTheme.titleSmall,
         ),
         subtitle: Text(
           subtitle,
-          style: GoogleFonts.roboto(
-              color: Colors.black,
-              fontSize: 12.sp,
-              fontWeight: FontWeight.normal),
+          style: Theme.of(context).textTheme.displaySmall,
         ),
         trailing: SizedBox(
             child: SvgPicture.asset(
           'assets/icons/arrow-right.svg',
           height: 10.h,
           width: 10.w,
+          colorFilter: colorFilter,
         )),
       ),
       Divider(

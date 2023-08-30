@@ -73,7 +73,7 @@ class SignInController {
   }
 
   Future<bool> signOut() async {
-    if (Global.storageService.removeTokenId()) {
+    if (await Global.storageService.removeTokenId()) {
       await FirebaseAuth.instance.signOut();
       return true;
     }
