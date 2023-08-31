@@ -16,6 +16,7 @@ import '../../../common/global.dart';
 import '../Authentication/Signin/sign_in_screen.dart';
 
 class OnboardScreen extends StatefulWidget {
+  static const routeName = '/onboard';
   const OnboardScreen({super.key});
 
   @override

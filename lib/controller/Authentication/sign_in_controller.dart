@@ -17,11 +17,15 @@ class SignInController {
 
         if (emailAddress.isEmpty) {
           createToast(description: 'Enter your email address to continue.');
+          return;
         } else if (password.isEmpty) {
           createToast(description: 'Enter your password to continue.');
+          return;
         }
 
         try {
+          signInBloc.add(LoginButtonLoadingEvent());
+          print("herer");
           final credentials = await FirebaseAuth.instance
               .signInWithEmailAndPassword(
                   email: emailAddress, password: password)
@@ -29,24 +33,28 @@ class SignInController {
             final user = userCredential.user;
             if (user != null && user.emailVerified) {
               String? idToken = await userCredential.user!.getIdToken();
-              Global.storageService.setString(
-                  AppConstants.STORAGE_USER_TOKEN_KEY, idToken.toString());
-              signInBloc.add(LoginButtonClickedEvent());
+              print("Token generated");
+              Global.storageService
+                  .setString(
+                      AppConstants.STORAGE_USER_TOKEN_KEY, idToken.toString())
+                  .whenComplete(
+                      () => signInBloc.add(LoginButtonSuccessEvent()));
             }
           });
 
           final user = credentials.user;
-          if (user == null) {}
+
           if (!user!.emailVerified) {
-            print("User not verfied");
+            signInBloc.add(LoginButtonErrorEvent("User not verfied"));
           }
         } on FirebaseAuthException catch (e) {
           if (e.code == "user-not-found") {
-            print("No user found for that email");
+            signInBloc
+                .add(LoginButtonErrorEvent("No user found for that email"));
           } else if (e.code == "wrong-password") {
-            print("Wrong password provided for that user");
+            signInBloc.add(LoginButtonErrorEvent("Email or password is wrong"));
           } else if (e.code == 'invalid-email') {
-            print("You email format is wrong");
+            signInBloc.add(LoginButtonErrorEvent("Email or password is wrong"));
           }
           //
         }
@@ -67,9 +75,9 @@ class SignInController {
       } catch (e) {
         return null;
       }
+    } else {
+      return null;
     }
-
-    return null;
   }
 
   Future<bool> signOut() async {

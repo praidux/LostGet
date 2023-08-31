@@ -11,6 +11,7 @@ import 'package:lost_get/presentation_layer/screens/Onboarding/onboard_screen.da
 import '../../presentation_layer/screens/Profile Settings/Settings/UserPreference/user_preference_screen.dart';
 import '../../presentation_layer/screens/Profile Settings/EditProfile/edit_profile.dart';
 import '../../presentation_layer/screens/Profile Settings/Settings/settings_screen.dart';
+import '../../presentation_layer/screens/SplashScreen/splash_screen.dart';
 import '../global.dart';
 import '../../../common/constants/profile_settings_constants.dart';
 
@@ -21,16 +22,7 @@ class AppRouter {
 
     switch (routeSettings.name) {
       case '/':
-        bool deviceFirstOpen = Global.storageService.getDeviceFirstOpen();
-        if (deviceFirstOpen) {
-          Future<UserCredential?> autoSignIn = SignInController.autoSignIn();
-          if (autoSignIn != null) {
-            return MaterialPageRoute(builder: (context) => const Dashboard());
-          }
-          return loginScreen;
-        } else {
-          return MaterialPageRoute(builder: (context) => const OnboardScreen());
-        }
+        return MaterialPageRoute(builder: (context) => const SplashScreen());
 
       case LoginScreen.routeName:
         return loginScreen;

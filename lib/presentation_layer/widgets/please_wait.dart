@@ -6,14 +6,16 @@ import 'package:lost_get/common/constants/colors.dart';
 import 'package:provider/provider.dart';
 
 class PleaseWaitDialog extends StatelessWidget {
-  const PleaseWaitDialog({super.key});
+  final String description;
+  const PleaseWaitDialog({super.key, required this.description});
 
   @override
   Widget build(BuildContext context) {
     return Consumer(
       builder: (context, ChangeThemeMode value, child) => Container(
         decoration: BoxDecoration(
-            color: value.isDarkMode ? AppColors.darkPrimaryColor : Colors.white,
+            color:
+                value.isDarkMode() ? AppColors.darkPrimaryColor : Colors.white,
             borderRadius: BorderRadius.circular(6)),
         width: 200.w,
         height: 35.h,
@@ -26,7 +28,7 @@ class PleaseWaitDialog extends StatelessWidget {
             const CircularProgressIndicator(), // Circular loading indicator
             const SizedBox(width: 16.0),
             Text(
-              "Please Wait...",
+              description,
               style: Theme.of(context).textTheme.bodySmall,
             ), // Text message
           ],

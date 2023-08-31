@@ -32,7 +32,7 @@ class _EditProfileSettingsState extends State<EditProfileSettings> {
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           iconTheme: IconThemeData(
-            color: value.isDarkMode
+            color: value.isDarkMode()
                 ? Colors.white
                 : Colors.black, //change your color here
           ),
@@ -52,7 +52,7 @@ class _EditProfileSettingsState extends State<EditProfileSettings> {
               itemBuilder: (context, index) {
                 var data = settingsList[index];
                 return createListTile(context, data['title'], data['subtitle'],
-                    null, data['handleFunction'], value.isDarkMode);
+                    null, data['handleFunction'], value.isDarkMode());
               },
               itemCount: settingsList.length,
             ),

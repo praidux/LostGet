@@ -50,95 +50,99 @@ class _SignUpState extends State<SignUp> {
             onPressed: () => Navigator.of(context).pop(),
           ),
         ),
-        body: SingleChildScrollView(
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              headingText(context, 'Sign Up'),
-              SizedBox(
-                height: 18.h,
-              ),
-              InputTextField(
-                textHint: 'Your Full Name',
-                title: 'Full Name',
-                imageUrl: 'assets/icons/profile.svg',
-                textOnChanged: (firstName) {
-                  signUpBloc.add(FirstNameOnChangedEvent(firstName));
-                },
-              ),
-              SizedBox(
-                height: 9.h,
-              ),
-              InputTextField(
-                textHint: 'Your Email',
-                title: 'E-mail',
-                imageUrl: 'assets/icons/mail.svg',
-                textOnChanged: (email) {
-                  signUpBloc.add(EmailOnChangedEvent(email));
-                },
-              ),
-              SizedBox(
-                height: 9.h,
-              ),
-              BlocBuilder<SignUpBloc, SignUpState>(
-                bloc: signUpBloc,
-                builder: (context, state) {
-                  return PasswordField(
-                      textHint: 'Your Password',
-                      title: 'Password',
-                      imageUrl: 'assets/icons/lock.svg',
-                      isHidden: state.isHidden,
-                      toggleEye: () {
-                        signUpBloc.add(EyeToggleViewClickedEvent());
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    headingText(context, 'Sign Up'),
+                    SizedBox(
+                      height: 18.h,
+                    ),
+                    InputTextField(
+                      textHint: 'Your Full Name',
+                      title: 'Full Name',
+                      imageUrl: 'assets/icons/profile.svg',
+                      textOnChanged: (firstName) {
+                        signUpBloc.add(FirstNameOnChangedEvent(firstName));
                       },
-                      passwordOnChange: (password) {
-                        signUpBloc.add(PasswordOnChangedEvent(password));
-                      });
-                },
-              ),
-              SizedBox(
-                height: 9.h,
-              ),
-              RichText(
-                text: TextSpan(
-                    text: "By signing up you agree to our ",
-                    style: Theme.of(context).textTheme.bodySmall,
-                    children: [
-                      const TextSpan(
-                          text: "Terms & Condition",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryColor,
-                          )),
-                      TextSpan(
-                          text: " and ",
-                          style: Theme.of(context).textTheme.bodySmall),
-                      TextSpan(
-                          text: "Privacy Policy.*",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryColor,
-                          ),
-                          recognizer: TapGestureRecognizer()..onTap = () {})
-                    ]),
-              ),
-              SizedBox(
-                height: 20.h,
-              ),
-              CreateButton(
-                  title: 'Register Now',
-                  handleButton: () {
-                    SignUpController(context, signUpBloc).handleSignUp();
-                  }),
-              SizedBox(
-                height: 65.h,
-              ),
-              createRichTextForLoginSignUp(
-                  context, 'Already a member? ', 'Login', () {
-                signUpBloc.add(LoginButtonClickedEvent());
-              }),
-            ]),
+                    ),
+                    SizedBox(
+                      height: 9.h,
+                    ),
+                    InputTextField(
+                      textHint: 'Your Email',
+                      title: 'E-mail',
+                      imageUrl: 'assets/icons/mail.svg',
+                      textOnChanged: (email) {
+                        signUpBloc.add(EmailOnChangedEvent(email));
+                      },
+                    ),
+                    SizedBox(
+                      height: 9.h,
+                    ),
+                    BlocBuilder<SignUpBloc, SignUpState>(
+                      bloc: signUpBloc,
+                      builder: (context, state) {
+                        return PasswordField(
+                            textHint: 'Your Password',
+                            title: 'Password',
+                            imageUrl: 'assets/icons/lock.svg',
+                            isHidden: state.isHidden,
+                            toggleEye: () {
+                              signUpBloc.add(EyeToggleViewClickedEvent());
+                            },
+                            passwordOnChange: (password) {
+                              signUpBloc.add(PasswordOnChangedEvent(password));
+                            });
+                      },
+                    ),
+                    SizedBox(
+                      height: 9.h,
+                    ),
+                    RichText(
+                      text: TextSpan(
+                          text: "By signing up you agree to our ",
+                          style: Theme.of(context).textTheme.bodySmall,
+                          children: [
+                            const TextSpan(
+                                text: "Terms & Condition",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primaryColor,
+                                )),
+                            TextSpan(
+                                text: " and ",
+                                style: Theme.of(context).textTheme.bodySmall),
+                            TextSpan(
+                                text: "Privacy Policy.*",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primaryColor,
+                                ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {})
+                          ]),
+                    ),
+                    SizedBox(
+                      height: 20.h,
+                    ),
+                    CreateButton(
+                        title: 'Register Now',
+                        handleButton: () {
+                          SignUpController(context, signUpBloc).handleSignUp();
+                        }),
+                    SizedBox(
+                      height: 65.h,
+                    ),
+                    createRichTextForLoginSignUp(
+                        context, 'Already a member? ', 'Login', () {
+                      signUpBloc.add(LoginButtonClickedEvent());
+                    }),
+                  ]),
+            ),
           ),
         ),
       ),

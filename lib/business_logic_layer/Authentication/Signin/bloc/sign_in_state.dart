@@ -19,4 +19,12 @@ class SignInActionState extends SignInState {}
 
 class RegisterButtonClickedState extends SignInActionState {}
 
-class LoginButtonClickedState extends SignInActionState {}
+class LoginButtonErrorState extends SignInActionState {
+  final String message;
+
+  LoginButtonErrorState(this.message);
+}
+
+class LoginButtonLoadingState extends SignInActionState {}
+
+class LoginButtonSuccessState extends SignInActionState {}

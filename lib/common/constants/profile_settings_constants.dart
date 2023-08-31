@@ -5,12 +5,14 @@ import 'package:lost_get/common/constants/constant.dart';
 class ProfileSettingsConstants {
   final ProfileSettingsBloc? profileSettingsBloc;
   final SettingsBloc? settingsBloc;
+  final bool? isDark;
 
-  ProfileSettingsConstants({this.profileSettingsBloc, this.settingsBloc});
+  ProfileSettingsConstants(
+      {this.profileSettingsBloc, this.settingsBloc, this.isDark});
   List<Map<String, dynamic>> getProfileList() {
     return [
       {
-        'imgUrl': AppConstants.isDark
+        'imgUrl': isDark != null && isDark == true
             ? 'assets/icons/dark_view_my_reports.svg'
             : 'assets/icons/view_my_report.svg',
         'title': 'View my reports',
@@ -18,7 +20,7 @@ class ProfileSettingsConstants {
         'handleFunction': () {},
       },
       {
-        'imgUrl': AppConstants.isDark
+        'imgUrl': isDark != null && isDark == true
             ? 'assets/icons/dark_support.svg'
             : 'assets/icons/support.svg',
         'title': 'Support and Help',
@@ -26,7 +28,7 @@ class ProfileSettingsConstants {
         'handleFunction': () {},
       },
       {
-        'imgUrl': AppConstants.isDark
+        'imgUrl': isDark != null && isDark == true
             ? 'assets/icons/dark_setting.svg'
             : 'assets/icons/setting.svg',
         'title': 'Settings',
@@ -36,7 +38,7 @@ class ProfileSettingsConstants {
         },
       },
       {
-        'imgUrl': AppConstants.isDark
+        'imgUrl': isDark != null && isDark == true
             ? 'assets/icons/dark_share_feedback.svg'
             : 'assets/icons/share_feedback.svg',
         'title': 'Share Feedback',
@@ -44,7 +46,7 @@ class ProfileSettingsConstants {
         'handleFunction': () {},
       },
       {
-        'imgUrl': AppConstants.isDark
+        'imgUrl': isDark != null && isDark == true
             ? 'assets/icons/dark_logout.svg'
             : 'assets/icons/logout.svg',
         'title': 'Log Out',

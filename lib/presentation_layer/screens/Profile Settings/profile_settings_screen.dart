@@ -35,10 +35,6 @@ class _ProfileSettingsState extends State<ProfileSettings> {
 
   @override
   Widget build(BuildContext context) {
-    List<Map<String, dynamic>> profileList =
-        ProfileSettingsConstants(profileSettingsBloc: profileSettingsBloc)
-            .getProfileList();
-
     return BlocListener<ProfileSettingsBloc, ProfileSettingsState>(
       bloc: profileSettingsBloc,
       listener: (context, state) {
@@ -130,7 +126,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                                     .add(EditProfileButtonClickedEvent()),
                                 child: Text("View and edit profile",
                                     style: GoogleFonts.roboto(
-                                      color: value.isDarkMode
+                                      color: value.isDarkMode()
                                           ? Colors.white
                                           : Colors.black,
                                       fontSize: 12.sp,
@@ -138,7 +134,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                                           ? FontWeight.w900
                                           : FontWeight.w700,
                                       decoration: TextDecoration.underline,
-                                      decorationColor: value.isDarkMode
+                                      decorationColor: value.isDarkMode()
                                           ? Colors.white
                                           : Colors.black,
                                     )),
@@ -189,7 +185,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                                   .add(EditProfileButtonClickedEvent()),
                               child: Text("View and edit profile",
                                   style: GoogleFonts.roboto(
-                                    color: value.isDarkMode
+                                    color: value.isDarkMode()
                                         ? Colors.white
                                         : Colors.black,
                                     fontSize: 12.sp,
@@ -197,7 +193,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                                         ? FontWeight.w900
                                         : FontWeight.w700,
                                     decoration: TextDecoration.underline,
-                                    decorationColor: value.isDarkMode
+                                    decorationColor: value.isDarkMode()
                                         ? Colors.white
                                         : Colors.black,
                                   )),
@@ -212,19 +208,27 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                   height: 15.h,
                 ),
                 Consumer(
-                    builder: (context, ChangeThemeMode value, child) => Column(
-                          children: profileList
-                              .map(
-                                (e) => createListTile(
-                                    context,
-                                    e['title'] as String,
-                                    e['subtitle'] as String,
-                                    e['imgUrl'] as String,
-                                    e['handleFunction'] as Function,
-                                    value.isDarkMode),
-                              )
-                              .toList(),
-                        ))
+                  builder: (context, ChangeThemeMode value, child) {
+                    List<Map<String, dynamic>> profileList =
+                        ProfileSettingsConstants(
+                                profileSettingsBloc: profileSettingsBloc,
+                                isDark: value.isDarkMode())
+                            .getProfileList();
+                    return Column(
+                      children: profileList
+                          .map(
+                            (e) => createListTile(
+                                context,
+                                e['title'] as String,
+                                e['subtitle'] as String,
+                                e['imgUrl'] as String,
+                                e['handleFunction'] as Function,
+                                value.isDarkMode()),
+                          )
+                          .toList(),
+                    );
+                  },
+                )
               ],
             ),
           ),

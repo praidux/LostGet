@@ -19,4 +19,12 @@ class RegisterButtonClickedEvent extends SignInEvent {}
 
 class EyeToggleViewClickedEvent extends SignInEvent {}
 
-class LoginButtonClickedEvent extends SignInEvent {}
+class LoginButtonErrorEvent extends SignInEvent {
+  final String message;
+
+  LoginButtonErrorEvent(this.message);
+}
+
+class LoginButtonLoadingEvent extends SignInEvent {}
+
+class LoginButtonSuccessEvent extends SignInEvent {}

@@ -6,6 +6,8 @@ class AppConstants {
   // ignore: constant_identifier_names
   static const String STORAGE_USER_TOKEN_KEY = 'user_token_key';
 
+  static const String DARK_THEME = '_dark_theme';
+
   static const List<String> GENDERS = ['Male', 'Female', 'Prefer Not To Say'];
 
   static bool isDark = false;

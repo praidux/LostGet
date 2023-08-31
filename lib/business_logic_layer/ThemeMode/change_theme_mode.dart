@@ -1,12 +1,31 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:lost_get/common/constants/constant.dart';
+
+import '../../common/global.dart';
 
 class ChangeThemeMode extends ChangeNotifier {
-  bool _isDarkMode = false;
+  int _isDarkMode = Global.storageService.getDarkMode() ?? 0;
+  int tempDarkMode = Global.storageService.getDarkMode() ?? 0;
+  // print("");
   bool _isDylexsia = false;
 
-  bool get isDarkMode => _isDarkMode;
-  void toggleTheme(bool value) {
+  int get darkMode => _isDarkMode;
+
+  bool isDarkMode() {
+    return _isDarkMode == 0 ? false : true;
+  }
+
+  void setDarkMode(int value) {
+    tempDarkMode = value;
+    notifyListeners();
+  }
+
+  void toggleTheme(int value) {
     _isDarkMode = value;
+
+    Global.storageService.setInt(AppConstants.DARK_THEME, value);
     notifyListeners();
   }
 
@@ -16,5 +35,6 @@ class ChangeThemeMode extends ChangeNotifier {
     notifyListeners();
   }
 
-  ThemeMode get currentTheme => _isDarkMode ? ThemeMode.dark : ThemeMode.light;
+  ThemeMode get currentTheme =>
+      _isDarkMode == 1 ? ThemeMode.dark : ThemeMode.light;
 }

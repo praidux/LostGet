@@ -23,7 +23,7 @@ class NavBar extends StatelessWidget {
       child: Consumer(
         builder: (context, ChangeThemeMode changeThemeMode, child) {
           final bool isDyslexia = changeThemeMode.isDyslexia;
-          ColorFilter? colorFilter = changeThemeMode.isDarkMode
+          ColorFilter? colorFilter = changeThemeMode.isDarkMode()
               ? const ColorFilter.mode(Colors.white, BlendMode.srcIn)
               : null;
           return BottomNavigationBar(
@@ -52,7 +52,7 @@ class NavBar extends StatelessWidget {
                   icon: SvgPicture.asset('assets/icons/add_report_inactive.svg',
                       colorFilter: colorFilter),
                   activeIcon: SvgPicture.asset(
-                    changeThemeMode.isDarkMode
+                    changeThemeMode.isDarkMode()
                         ? 'assets/icons/dark_add_report_active.svg'
                         : 'assets/icons/add_report_active.svg',
                   ),
@@ -61,7 +61,7 @@ class NavBar extends StatelessWidget {
                 icon: SvgPicture.asset('assets/icons/my_reports_inactive.svg',
                     colorFilter: colorFilter),
                 activeIcon: SvgPicture.asset(
-                  changeThemeMode.isDarkMode
+                  changeThemeMode.isDarkMode()
                       ? 'assets/icons/dark_my_reports_active.svg'
                       : 'assets/icons/my_reports_active.svg',
                 ),

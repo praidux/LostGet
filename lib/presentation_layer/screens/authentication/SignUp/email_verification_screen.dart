@@ -86,63 +86,65 @@ class _EmailVerificationState extends State<EmailVerification> {
       },
       child: Scaffold(
         appBar: AppBar(),
-        body: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            SizedBox(
-              child: SvgPicture.asset(
-                'assets/icons/verification.svg',
-                width: 30.w,
-                height: 30.h,
+        body: SafeArea(
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              SizedBox(
+                child: SvgPicture.asset(
+                  'assets/icons/verification.svg',
+                  width: 30.w,
+                  height: 30.h,
+                ),
               ),
-            ),
-            SizedBox(
-              height: 9.h,
-            ),
-            headingText(context, 'Check Your Mail'),
-            SizedBox(
-              height: 9.h,
-            ),
-            RichText(
-              text: TextSpan(
-                  text: "We've sent an email confirmation code to ",
-                  style: Theme.of(context).textTheme.bodySmall,
-                  children: [
-                    TextSpan(
-                        text: "${widget.userCredential.user!.email}. ",
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                    const TextSpan(
-                        text:
-                            "Check you email and click on the confirmation link to continue.")
-                  ]),
-            ),
-            SizedBox(
-              height: 18.h,
-            ),
-            Text(
-              "Didn't receive verification message?",
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-            SizedBox(
-              height: 8.h,
-            ),
-            BlocBuilder<EmailVerificationBloc, EmailVerificationState>(
-              bloc: emailVerificationBloc,
-              builder: (context, state) {
-                if (state is CountDownTimerState &&
-                    state.remainingSeconds > 0) {
+              SizedBox(
+                height: 9.h,
+              ),
+              headingText(context, 'Check Your Mail'),
+              SizedBox(
+                height: 9.h,
+              ),
+              RichText(
+                text: TextSpan(
+                    text: "We've sent an email confirmation code to ",
+                    style: Theme.of(context).textTheme.bodySmall,
+                    children: [
+                      TextSpan(
+                          text: "${widget.userCredential.user!.email}. ",
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
+                      const TextSpan(
+                          text:
+                              "Check you email and click on the confirmation link to continue.")
+                    ]),
+              ),
+              SizedBox(
+                height: 18.h,
+              ),
+              Text(
+                "Didn't receive verification message?",
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              SizedBox(
+                height: 8.h,
+              ),
+              BlocBuilder<EmailVerificationBloc, EmailVerificationState>(
+                bloc: emailVerificationBloc,
+                builder: (context, state) {
+                  if (state is CountDownTimerState &&
+                      state.remainingSeconds > 0) {
+                    return CreateButton(
+                      title: 'Please Wait ${state.remainingSeconds}',
+                      handleButton: null,
+                    );
+                  }
                   return CreateButton(
-                    title: 'Please Wait ${state.remainingSeconds}',
-                    handleButton: null,
-                  );
-                }
-                return CreateButton(
-                    title: "Resend Verification Email",
-                    handleButton: handleButton);
-              },
-            ),
-          ]),
+                      title: "Resend Verification Email",
+                      handleButton: handleButton);
+                },
+              ),
+            ]),
+          ),
         ),
       ),
     );

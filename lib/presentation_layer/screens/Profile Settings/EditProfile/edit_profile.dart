@@ -43,6 +43,7 @@ class _EditProfileState extends State<EditProfile> {
   // final ImagePicker _picker = ImagePicker();
   XFile? _pickedImage;
   String? _uploadedImageUrl;
+  // ignore: unused_field
   String? _oldImageUrl;
   String? _completePhoneNumber;
 
@@ -74,7 +75,7 @@ class _EditProfileState extends State<EditProfile> {
             color: Colors.transparent
                 .withOpacity(0.7), // Make the overlay transparent
             child: const Center(
-              child: PleaseWaitDialog(),
+              child: PleaseWaitDialog(description: "Please Wait..."),
             ),
           ),
         );
@@ -302,7 +303,7 @@ class _EditProfileState extends State<EditProfile> {
                                         name: 'Prefer Not To Say',
                                         value: "Prefer Not To Say"),
                                   ],
-                                  dropdownColor: value.isDarkMode
+                                  dropdownColor: value.isDarkMode()
                                       ? AppColors.darkPrimaryColor
                                       : Colors.white,
                                   textFieldDecoration: const InputDecoration(
@@ -622,7 +623,7 @@ PreferredSizeWidget? createAppBar(context) {
     centerTitle: true,
     leading: Consumer(
       builder: (context, ChangeThemeMode value, child) {
-        ColorFilter? colorFilter = value.isDarkMode
+        ColorFilter? colorFilter = value.isDarkMode()
             ? const ColorFilter.mode(Colors.white, BlendMode.srcIn)
             : null;
         return IconButton(

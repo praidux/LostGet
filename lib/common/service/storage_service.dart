@@ -32,4 +32,12 @@ class StorageService {
         await _prefs.remove(AppConstants.STORAGE_USER_TOKEN_KEY);
     return tokenRemoved == true ? true : false;
   }
+
+  Future<bool> setInt(String key, int value) {
+    return _prefs.setInt(key, value);
+  }
+
+  int? getDarkMode() {
+    return _prefs.getInt(AppConstants.DARK_THEME);
+  }
 }
