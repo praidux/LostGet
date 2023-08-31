@@ -8,13 +8,17 @@ class InputTextField extends StatelessWidget {
   final String title;
   final String imageUrl;
   final Function textOnChanged;
+  final TextEditingController controller;
+  final Function validatorFunction;
 
   const InputTextField({
     super.key,
+    required this.controller,
     required this.textHint,
     required this.title,
     required this.imageUrl,
     required this.textOnChanged,
+    required this.validatorFunction,
   });
 
   @override
@@ -29,9 +33,13 @@ class InputTextField extends StatelessWidget {
       ),
       SizedBox(
         width: MediaQuery.sizeOf(context).width,
-        child: TextField(
+        child: TextFormField(
+          controller: controller,
           onChanged: (value) {
             textOnChanged(value);
+          },
+          validator: (value) {
+            validatorFunction(value);
           },
           style: Theme.of(context).textTheme.bodySmall,
           keyboardType: TextInputType.emailAddress,

@@ -91,8 +91,12 @@ class _UserPreferenceScreenState extends State<UserPreferenceScreen> {
                 if (changeThemeMode.tempDarkMode == changeThemeMode.darkMode) {
                   Navigator.pop(context);
                 } else {
-                  changeThemeMode.toggleTheme(changeThemeMode.tempDarkMode);
                   Navigator.pop(context);
+                  Future.delayed(
+                    const Duration(milliseconds: 200),
+                    () => changeThemeMode
+                        .toggleTheme(changeThemeMode.tempDarkMode),
+                  );
                 }
               },
               child: const Text("Ok"),

@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:lost_get/data_store_layer/repository/users_base_repository.dart';
@@ -13,17 +15,16 @@ class UserRepository extends BaseUsersRepository {
   UserRepository({FirebaseFirestore? firebaseFirestore})
       : _firebaseFirestore = firebaseFirestore ?? FirebaseFirestore.instance;
 
-  Future<UserProfile> getUserDetails(String email) async {
-    late final userData;
+  Future<UserProfile?> getUserDetails(String uid) async {
+    late final UserProfile? userData;
     try {
-      final snapshot = await _firebaseFirestore
-          .collection('users')
-          .where("email", isEqualTo: email)
-          .get();
+      final snapshot =
+          await _firebaseFirestore.collection('users').doc(uid).get();
 
-      userData = snapshot.docs.map((e) => UserProfile.fromSnapshot(e)).single;
+      userData = UserProfile.fromSnapshot(snapshot);
     } catch (e) {
       createToast(description: "Error Occurred");
+      return null;
     }
     return userData;
   }
@@ -52,5 +53,56 @@ class UserRepository extends BaseUsersRepository {
     String downloadUrl = await taskSnapshot.ref.getDownloadURL();
     print("Url is $downloadUrl");
     return downloadUrl;
+  }
+
+  Future<bool> isNewUser(String uid) async {
+    final snapshot =
+        await _firebaseFirestore.collection('users').doc(uid).get();
+    final data = snapshot.data();
+    print("null");
+    return data == null ? true : false;
+  }
+
+  // Future<UserCredential> signInGoogle() async {
+  //   // Trigger the authentication flow
+  //   final GoogleSignInAccount? googleUser = await GoogleSignIn()
+  //       .signIn()
+  //       .onError(
+  //           (error, stackTrace) => createToast(description: "Error occurred"));
+
+  //   // Obtain the auth details from the request
+  //   final GoogleSignInAuthentication? googleAuth =
+  //       await googleUser?.authentication;
+
+  //   // Create a new credential
+  //   final credential = GoogleAuthProvider.credential(
+  //     accessToken: googleAuth?.accessToken,
+  //     idToken: googleAuth?.idToken,
+  //   );
+
+  //   // Once signed in, return the UserCredential
+  //   return await FirebaseAuth.instance.signInWithCredential(credential);
+  // }
+
+  Future<UserCredential> signInWithGoogle() async {
+    // Trigger the authentication flow
+
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+    // Obtain the auth details from the request
+    final GoogleSignInAuthentication? googleAuth =
+        await googleUser?.authentication;
+
+    // Create a new credential
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+
+    UserCredential userCredential =
+        await FirebaseAuth.instance.signInWithCredential(credential);
+
+    // Once signed in, return the UserCredential
+    return userCredential;
   }
 }

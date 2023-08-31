@@ -15,7 +15,7 @@ class EditProfileController {
   EditProfileController({this.editProfileBloc, this.changeProfileBloc});
 
   getUserData() {
-    final email = FirebaseAuth.instance.currentUser?.email;
+    final email = FirebaseAuth.instance.currentUser?.uid;
     if (email != null) {
       return _userRepo.getUserDetails(email);
     }
@@ -30,9 +30,6 @@ class EditProfileController {
     final String email = newProfileData['email'];
     var phoneNumber = newProfileData['phoneNumber'];
     var imgUrl = newProfileData['imgUrl'];
-
-    print("New email $email");
-    print("Old email: ${oldProfileData.email}");
 
     Map<String, dynamic> newMap = {};
 

@@ -51,6 +51,9 @@ class AppRouter {
       case UserPreferenceScreen.routeName:
         return MaterialPageRoute(
             builder: (context) => const UserPreferenceScreen());
+
+      case OnboardScreen.routeName:
+        return MaterialPageRoute(builder: (context) => const OnboardScreen());
     }
     return null;
   }

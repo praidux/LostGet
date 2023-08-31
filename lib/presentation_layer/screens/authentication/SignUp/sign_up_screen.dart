@@ -61,44 +61,44 @@ class _SignUpState extends State<SignUp> {
                     SizedBox(
                       height: 18.h,
                     ),
-                    InputTextField(
-                      textHint: 'Your Full Name',
-                      title: 'Full Name',
-                      imageUrl: 'assets/icons/profile.svg',
-                      textOnChanged: (firstName) {
-                        signUpBloc.add(FirstNameOnChangedEvent(firstName));
-                      },
-                    ),
-                    SizedBox(
-                      height: 9.h,
-                    ),
-                    InputTextField(
-                      textHint: 'Your Email',
-                      title: 'E-mail',
-                      imageUrl: 'assets/icons/mail.svg',
-                      textOnChanged: (email) {
-                        signUpBloc.add(EmailOnChangedEvent(email));
-                      },
-                    ),
-                    SizedBox(
-                      height: 9.h,
-                    ),
-                    BlocBuilder<SignUpBloc, SignUpState>(
-                      bloc: signUpBloc,
-                      builder: (context, state) {
-                        return PasswordField(
-                            textHint: 'Your Password',
-                            title: 'Password',
-                            imageUrl: 'assets/icons/lock.svg',
-                            isHidden: state.isHidden,
-                            toggleEye: () {
-                              signUpBloc.add(EyeToggleViewClickedEvent());
-                            },
-                            passwordOnChange: (password) {
-                              signUpBloc.add(PasswordOnChangedEvent(password));
-                            });
-                      },
-                    ),
+                    // InputTextField(
+                    //   textHint: 'Your Full Name',
+                    //   title: 'Full Name',
+                    //   imageUrl: 'assets/icons/profile.svg',
+                    //   textOnChanged: (firstName) {
+                    //     signUpBloc.add(FirstNameOnChangedEvent(firstName));
+                    //   },
+                    // ),
+                    // SizedBox(
+                    //   height: 9.h,
+                    // ),
+                    // InputTextField(
+                    //   textHint: 'Your Email',
+                    //   title: 'E-mail',
+                    //   imageUrl: 'assets/icons/mail.svg',
+                    //   textOnChanged: (email) {
+                    //     signUpBloc.add(EmailOnChangedEvent(email));
+                    //   },
+                    // ),
+                    // SizedBox(
+                    //   height: 9.h,
+                    // ),
+                    // BlocBuilder<SignUpBloc, SignUpState>(
+                    //   bloc: signUpBloc,
+                    //   builder: (context, state) {
+                    //     return PasswordField(
+                    //         textHint: 'Your Password',
+                    //         title: 'Password',
+                    //         imageUrl: 'assets/icons/lock.svg',
+                    //         isHidden: state.isHidden,
+                    //         toggleEye: () {
+                    //           signUpBloc.add(EyeToggleViewClickedEvent());
+                    //         },
+                    //         passwordOnChange: (password) {
+                    //           signUpBloc.add(PasswordOnChangedEvent(password));
+                    //         });
+                    //   },
+                    // ),
                     SizedBox(
                       height: 9.h,
                     ),

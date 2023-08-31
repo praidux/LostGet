@@ -50,6 +50,7 @@ class SignUpController {
             dateOfBirth: "",
             preferenceList: <String, dynamic>{},
             gender: "");
+
         await userRepository.createUserProfile(
             credentials.user!.uid, userProfile);
 

@@ -24,12 +24,21 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final SignInBloc signinBloc = SignInBloc();
+  final formKey = GlobalKey<FormState>();
+  final TextEditingController _emailAddressController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   int loginButtonClickCount = 0;
   OverlayEntry? overlayEntry;
 
   void _handleLogin() {
-    loginButtonClickCount++;
-    SignInController().handleSignIn(context, 'email', signinBloc);
+    try {
+      if (formKey.currentState!.validate()) {
+        print("validated");
+        // Form is valid, proceed with submission
+        loginButtonClickCount++;
+        SignInController().handleSignIn(context, 'email', signinBloc);
+      }
+    } catch (e) {}
   }
 
   void showCustomLoadingDialog(BuildContext context) {
@@ -67,11 +76,9 @@ class _LoginScreenState extends State<LoginScreen> {
         }
 
         if (state is LoginButtonLoadingState) {
-          print("was in laoding");
           showCustomLoadingDialog(context);
         }
         if (state is LoginButtonSuccessState) {
-          print("was in loaded");
           hideCustomLoadingDialog(context);
           Navigator.of(context).pushReplacementNamed(Dashboard.routeName);
         }
@@ -86,106 +93,203 @@ class _LoginScreenState extends State<LoginScreen> {
           child: SingleChildScrollView(
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    headingText(context, "Login"),
-                    SizedBox(
-                      height: 18.h,
-                    ),
-                    BlocBuilder<SignInBloc, SignInState>(
-                      bloc: signinBloc,
-                      builder: (context, state) {
-                        return InputTextField(
-                          textHint: 'Your Email',
-                          title: 'E-mail',
-                          imageUrl: 'assets/icons/mail.svg',
-                          textOnChanged: (email) =>
-                              signinBloc.add(EmailOnChangedEvent(email: email)),
-                        );
-                      },
-                    ),
-                    SizedBox(
-                      height: 9.h,
-                    ),
-                    BlocBuilder<SignInBloc, SignInState>(
-                      bloc: signinBloc,
-                      builder: (context, state) {
-                        return PasswordField(
-                          textHint: 'Your Password',
-                          title: 'Password',
-                          imageUrl: 'assets/icons/lock.svg',
-                          isHidden: state.isHidden,
-                          toggleEye: () {
-                            signinBloc.add(EyeToggleViewClickedEvent());
-                          },
-                          passwordOnChange: (password) => signinBloc
-                              .add(PasswordOnChangedEvent(password: password)),
-                        );
-                      },
-                    ),
-                    SizedBox(
-                      height: 3.h,
-                    ),
-                    createCheckboxNecessaryItems(context),
-                    SizedBox(
-                      height: 30.h,
-                    ),
-                    CreateButton(
-                      title: 'Login',
-                      handleButton: _handleLogin,
-                    ),
-                    SizedBox(
-                      height: 29.h,
-                    ),
-                    Row(
-                      children: [
-                        const Expanded(
-                            child: Padding(
-                          padding: EdgeInsets.only(left: 8, right: 8),
-                          child: Divider(
-                            color: Colors.grey,
-                            thickness: 2,
-                          ),
-                        )),
-                        Text(
-                          'or continue with',
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
-                        const Expanded(
-                            child: Padding(
-                          padding: EdgeInsets.only(left: 8, right: 8),
-                          child: Divider(
-                            color: Colors.grey,
-                            thickness: 2,
-                          ),
-                        )),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 9.h,
-                    ),
-                    Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+              child: Form(
+                key: formKey,
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      headingText(context, "Login"),
+                      SizedBox(
+                        height: 18.h,
+                      ),
+                      Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Email',
+                              style: Theme.of(context).textTheme.titleSmall,
+                            ),
+                            const SizedBox(
+                              height: 6,
+                            ),
+                            SizedBox(
+                              width: MediaQuery.sizeOf(context).width,
+                              child: TextFormField(
+                                controller: _emailAddressController,
+                                onChanged: (value) {
+                                  // textOnChanged(value);
+                                },
+                                validator: (value) {
+                                  if (value!.isEmpty ||
+                                      !RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$')
+                                          .hasMatch(value)) {
+                                    print("here");
+                                    return 'Email is not correct';
+                                  } else {
+                                    return null;
+                                  }
+                                },
+                                style: Theme.of(context).textTheme.bodySmall,
+                                keyboardType: TextInputType.emailAddress,
+                                decoration: InputDecoration(
+                                  prefixIcon: IconButton(
+                                    onPressed: () {},
+                                    icon: SvgPicture.asset(
+                                      'assets/icons/mail.svg',
+                                      height: 10.h,
+                                      width: 10.w,
+                                    ),
+                                  ),
+                                  border: const OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(4))),
+                                  hintText: 'Your Email',
+                                  hintStyle:
+                                      Theme.of(context).textTheme.bodySmall,
+                                ),
+                              ),
+                            )
+                          ]),
+                      SizedBox(
+                        height: 9.h,
+                      ),
+                      BlocBuilder<SignInBloc, SignInState>(
+                        bloc: signinBloc,
+                        builder: (context, state) {
+                          return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Password",
+                                  style: Theme.of(context).textTheme.titleSmall,
+                                ),
+                                const SizedBox(
+                                  height: 6,
+                                ),
+                                SizedBox(
+                                  width: MediaQuery.sizeOf(context).width,
+                                  child: TextFormField(
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return 'Password field is empty';
+                                      }
+                                    },
+                                    controller: _passwordController,
+                                    style:
+                                        Theme.of(context).textTheme.bodySmall,
+                                    keyboardType: TextInputType.emailAddress,
+                                    onChanged: (password) {},
+                                    decoration: InputDecoration(
+                                      prefixIcon: IconButton(
+                                        onPressed: () {},
+                                        icon: SvgPicture.asset(
+                                          'assets/icons/lock.svg',
+                                          height: 10.h,
+                                          width: 10.w,
+                                        ),
+                                      ),
+
+                                      border: const OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(4))),
+                                      hintText: 'Your Password',
+
+                                      hintStyle:
+                                          Theme.of(context).textTheme.bodySmall,
+                                      suffixIcon: IconButton(
+                                          onPressed: () {
+                                            signinBloc.add(
+                                                EyeToggleViewClickedEvent());
+                                          },
+                                          icon: state.isHidden
+                                              ? SvgPicture.asset(
+                                                  'assets/icons/eye-off.svg',
+                                                  height: 10.h,
+                                                  width: 10.w,
+                                                )
+                                              : SvgPicture.asset(
+                                                  'assets/icons/eye-on.svg',
+                                                  height: 10.h,
+                                                  width: 10.w,
+                                                )),
+
+                                      // floatingLabelBehavior: FloatingLabelBehavior.never,
+                                    ),
+                                    obscureText: state.isHidden,
+                                  ),
+                                )
+                              ]);
+                        },
+                      ),
+                      SizedBox(
+                        height: 3.h,
+                      ),
+                      createCheckboxNecessaryItems(context),
+                      SizedBox(
+                        height: 30.h,
+                      ),
+                      CreateButton(
+                        title: 'Login',
+                        handleButton: _handleLogin,
+                      ),
+                      SizedBox(
+                        height: 29.h,
+                      ),
+                      Row(
                         children: [
-                          SvgPicture.asset('assets/icons/facebook_logo.svg'),
-                          SizedBox(
-                            width: 10.w,
+                          const Expanded(
+                              child: Padding(
+                            padding: EdgeInsets.only(left: 8, right: 8),
+                            child: Divider(
+                              color: Colors.grey,
+                              thickness: 2,
+                            ),
+                          )),
+                          Text(
+                            'or continue with',
+                            style: Theme.of(context).textTheme.headlineSmall,
                           ),
-                          SvgPicture.asset('assets/icons/google_logo.svg'),
+                          const Expanded(
+                              child: Padding(
+                            padding: EdgeInsets.only(left: 8, right: 8),
+                            child: Divider(
+                              color: Colors.grey,
+                              thickness: 2,
+                            ),
+                          )),
                         ],
                       ),
-                    ),
-                    SizedBox(
-                      height: 60.h,
-                    ),
-                    createRichTextForLoginSignUp(
-                        context,
-                        'Don\'t have an account? ',
-                        'Register Now',
-                        () => signinBloc.add(RegisterButtonClickedEvent())),
-                  ]),
+                      SizedBox(
+                        height: 9.h,
+                      ),
+                      Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            InkWell(
+                                child: SvgPicture.asset(
+                                    'assets/icons/facebook_logo.svg')),
+                            SizedBox(
+                              width: 10.w,
+                            ),
+                            InkWell(
+                                onTap: () => SignInController().handleSignIn(
+                                    context, 'google', signinBloc),
+                                child: SvgPicture.asset(
+                                    'assets/icons/google_logo.svg')),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 60.h,
+                      ),
+                      createRichTextForLoginSignUp(
+                          context,
+                          'Don\'t have an account? ',
+                          'Register Now',
+                          () => signinBloc.add(RegisterButtonClickedEvent())),
+                    ]),
+              ),
             ),
           ),
         ),

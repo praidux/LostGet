@@ -10,6 +10,7 @@ class PasswordField extends StatelessWidget {
   final bool isHidden;
   final Function toggleEye;
   final Function passwordOnChange;
+  final TextEditingController controller;
 
   const PasswordField({
     super.key,
@@ -19,6 +20,7 @@ class PasswordField extends StatelessWidget {
     required this.isHidden,
     required this.toggleEye,
     required this.passwordOnChange,
+    required this.controller,
   });
 
   @override
@@ -34,6 +36,7 @@ class PasswordField extends StatelessWidget {
       SizedBox(
         width: MediaQuery.sizeOf(context).width,
         child: TextField(
+          controller: controller,
           style: Theme.of(context).textTheme.bodySmall,
           keyboardType: TextInputType.emailAddress,
           onChanged: (password) => passwordOnChange(password),

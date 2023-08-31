@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:lost_get/business_logic_layer/EditProfile/ChangeProfile/bloc/change_profile_bloc.dart';
 
 import 'package:lost_get/controller/Profile%20Settings/edit_profile_controller.dart';

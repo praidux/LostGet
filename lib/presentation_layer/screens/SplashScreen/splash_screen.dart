@@ -24,7 +24,10 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-    _navigateToNextScreen(context);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _navigateToNextScreen(context);
+    });
+
     super.initState();
   }
 
@@ -32,7 +35,9 @@ class _SplashScreenState extends State<SplashScreen> {
     bool deviceFirstOpen = Global.storageService.getDeviceFirstOpen();
 
     if (deviceFirstOpen) {
+      print("Device opened saved");
       UserCredential? autoSignIn = await SignInController.autoSignIn();
+      print("Auto Signin: ${autoSignIn?.user!.displayName}");
       // Check auto-login status
       if (autoSignIn != null) {
         Navigator.pushReplacementNamed(context, Dashboard.routeName);
@@ -52,7 +57,7 @@ class _SplashScreenState extends State<SplashScreen> {
             ? AppColors.primaryColor
             : AppColors.darkPrimaryColor,
         body: Center(
-          child: Image.asset('assets/icons/splash_logo.png'),
+          child: SvgPicture.asset('assets/icons/splash_logo.svg'),
         ),
       ),
     );

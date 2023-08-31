@@ -32,11 +32,13 @@ class UserProfile {
       'preferenceList': preferenceList,
       'imgUrl': imgUrl,
       'dateOfBirth': dateOfBirth,
+      'gender': gender,
     };
   }
 
   factory UserProfile.fromSnapshot(DocumentSnapshot snapshot) {
     Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+
     return UserProfile(
         fullName: data['fullName'],
         biography: data['biography'],
