@@ -8,7 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
-import 'package:lost_get/business_logic_layer/ThemeMode/change_theme_mode.dart';
+import 'package:lost_get/business_logic_layer/Provider/change_theme_mode.dart';
 import 'package:lost_get/common/constants/colors.dart';
 import 'package:lost_get/controller/Profile%20Settings/edit_profile_controller.dart';
 import 'package:lost_get/models/user_profile.dart';
@@ -170,7 +170,7 @@ class _EditProfileState extends State<EditProfile> {
                                 createToast(description: state.errorMsg);
                               }
                               if (state is ChangeProfileLoadedState) {
-                                print("i was here");
+                              
                                 _pickedImage = state.pickedImage;
 
                                 return Stack(children: [
@@ -393,7 +393,7 @@ class _EditProfileState extends State<EditProfile> {
                             CreateButton(
                                 title: 'Save',
                                 handleButton: () async {
-                                  print(_dateOfBirthController.text);
+                              
                                   Map<String, dynamic> newProfileData = {
                                     "fullName": _fullNameController.text,
                                     "biography": _biographyController.text,
@@ -494,7 +494,7 @@ class _EditProfileState extends State<EditProfile> {
     if (userProfile.dateOfBirth != "" && userProfile.dateOfBirth != null) {
       _dateOfBirthController.text = userProfile.dateOfBirth!;
     } else {
-      print("in else");
+   
       _dateOfBirthController.text = "DD/MM/YYYY";
     }
 
@@ -512,7 +512,7 @@ class _EditProfileState extends State<EditProfile> {
   Widget createEditImage(context, Function handleImagePicker) {
     return Stack(children: [
       _pickedImage == null
-          ? Text('No Image Ex')
+          ? const Text('No Image Exists')
           : Image.file(File(_pickedImage!.path)),
       Positioned(
           bottom: 0,

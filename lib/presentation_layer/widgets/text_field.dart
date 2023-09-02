@@ -7,7 +7,7 @@ class InputTextField extends StatelessWidget {
   final String textHint;
   final String title;
   final String imageUrl;
-  final Function textOnChanged;
+
   final TextEditingController controller;
   final Function validatorFunction;
 
@@ -17,7 +17,6 @@ class InputTextField extends StatelessWidget {
     required this.textHint,
     required this.title,
     required this.imageUrl,
-    required this.textOnChanged,
     required this.validatorFunction,
   });
 
@@ -35,11 +34,9 @@ class InputTextField extends StatelessWidget {
         width: MediaQuery.sizeOf(context).width,
         child: TextFormField(
           controller: controller,
-          onChanged: (value) {
-            textOnChanged(value);
-          },
+          onChanged: (value) {},
           validator: (value) {
-            validatorFunction(value);
+            return validatorFunction(value);
           },
           style: Theme.of(context).textTheme.bodySmall,
           keyboardType: TextInputType.emailAddress,

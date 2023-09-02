@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lost_get/business_logic_layer/ThemeMode/change_theme_mode.dart';
+import 'package:lost_get/business_logic_layer/Provider/change_theme_mode.dart';
 import 'package:provider/provider.dart';
 
 import '../../common/constants/colors.dart';

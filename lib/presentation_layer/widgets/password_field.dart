@@ -9,8 +9,10 @@ class PasswordField extends StatelessWidget {
   final String imageUrl;
   final bool isHidden;
   final Function toggleEye;
-  final Function passwordOnChange;
+
   final TextEditingController controller;
+  final Function? handleValidator;
+  final Function? handleOnChange;
 
   const PasswordField({
     super.key,
@@ -19,8 +21,9 @@ class PasswordField extends StatelessWidget {
     required this.imageUrl,
     required this.isHidden,
     required this.toggleEye,
-    required this.passwordOnChange,
     required this.controller,
+    this.handleValidator,
+    this.handleOnChange,
   });
 
   @override
@@ -35,11 +38,15 @@ class PasswordField extends StatelessWidget {
       ),
       SizedBox(
         width: MediaQuery.sizeOf(context).width,
-        child: TextField(
+        child: TextFormField(
+          onChanged:
+              handleOnChange != null ? (value) => handleOnChange!(value) : null,
           controller: controller,
+          validator: handleValidator != null
+              ? (value) => handleValidator!(value)
+              : null,
           style: Theme.of(context).textTheme.bodySmall,
           keyboardType: TextInputType.emailAddress,
-          onChanged: (password) => passwordOnChange(password),
           decoration: InputDecoration(
             prefixIcon: IconButton(
               onPressed: () {},

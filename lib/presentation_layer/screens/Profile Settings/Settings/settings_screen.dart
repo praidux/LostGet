@@ -6,7 +6,7 @@ import 'package:lost_get/presentation_layer/widgets/profile_settings_widget.dart
 import 'package:provider/provider.dart';
 
 import '../../../../business_logic_layer/ProfileSettings/Settings/bloc/settings_bloc.dart';
-import '../../../../business_logic_layer/ThemeMode/change_theme_mode.dart';
+import '../../../../business_logic_layer/Provider/change_theme_mode.dart';
 
 class EditProfileSettings extends StatefulWidget {
   const EditProfileSettings({super.key});

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lost_get/business_logic_layer/ThemeMode/change_theme_mode.dart';
+import 'package:lost_get/business_logic_layer/Provider/change_theme_mode.dart';
 import 'package:lost_get/common/constants/welcome_constants.dart';
 
 import 'package:lost_get/presentation_layer/widgets/button.dart';

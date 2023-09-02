@@ -12,61 +12,57 @@ class SignUpController {
 
   SignUpController(this.context, this.signUpBloc);
 
-  Future<void> handleSignUp() async {
-    final fullName = signUpBloc.state.firstName;
+  Future<void> handleSignUp(
+      TextEditingController fulLNameController,
+      TextEditingController emailAddressController,
+      TextEditingController passwordController) async {
+    final fullName = fulLNameController.text;
 
-    final emailAddress = signUpBloc.state.emailAddress;
-    final password = signUpBloc.state.password;
-
-    if (fullName.isEmpty) {
-      createToast(description: 'Enter Full Name to continue');
-      return;
-    } else if (emailAddress.isEmpty) {
-      createToast(description: "Enter Email Address to continue");
-      return;
-    } else if (password.isEmpty) {
-      createToast(description: "Enter Password to continue");
-      return;
-    }
+    final emailAddress = emailAddressController.text;
+    final password = passwordController.text;
 
     try {
-      final credentials =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailAddress,
-        password: password,
-      );
-      if (credentials.user != null) {
-        await credentials.user!.sendEmailVerification();
+      signUpBloc.add(RegisterButtonClickedLoadingEvent());
 
-        UserRepository userRepository = UserRepository();
+      await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+              email: emailAddress, password: password)
+          .then((credentials) async {
+        if (credentials.user != null) {
+          await credentials.user!.sendEmailVerification();
+          UserRepository userRepository = UserRepository();
+          UserProfile userProfile = UserProfile(
+              fullName: fullName,
+              email: emailAddress,
+              isAdmin: false,
+              biography: "",
+              imgUrl: "",
+              phoneNumber: "",
+              dateOfBirth: "",
+              preferenceList: <String, dynamic>{},
+              gender: "");
 
-        UserProfile userProfile = UserProfile(
-            fullName: fullName,
-            email: emailAddress,
-            isAdmin: false,
-            biography: "",
-            imgUrl: "",
-            phoneNumber: "",
-            dateOfBirth: "",
-            preferenceList: <String, dynamic>{},
-            gender: "");
-
-        await userRepository.createUserProfile(
-            credentials.user!.uid, userProfile);
-
-        signUpBloc.add(NavigateToEmailVerificationEvent(credentials));
-      } else {
-        // User creation failed
-        createToast(description: "Some error occurred");
-      }
+          await userRepository
+              .createUserProfile(credentials.user!.uid, userProfile)
+              .then((value) {
+            signUpBloc.add(NavigateToEmailVerificationEvent(credentials));
+          });
+        } else {
+          // User creation failed
+          signUpBloc
+              .add(RegisterButtonClickedErrorEvent("User Creation Failed"));
+        }
+      });
       // if (credentials != null) {}
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        createToast(description: "Password is too weak");
+        signUpBloc.add(RegisterButtonClickedErrorEvent("User Creation Failed"));
       } else if (e.code == 'email-already-in-use') {
-        createToast(description: 'Email address already in use');
+        signUpBloc.add(
+            RegisterButtonClickedErrorEvent("Email Address already in use"));
       } else if (e.code == 'invalid-email') {
-        createToast(description: 'Email Address is invalid');
+        signUpBloc
+            .add(RegisterButtonClickedErrorEvent("Invalid Email Address"));
       }
     }
   }

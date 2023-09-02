@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:lost_get/business_logic_layer/Dashboard/bloc/dashboard_bloc.dart';
-import 'package:lost_get/business_logic_layer/ThemeMode/change_theme_mode.dart';
+import 'package:lost_get/business_logic_layer/Provider/change_theme_mode.dart';
 import 'package:provider/provider.dart';
 
 import '../../common/constants/colors.dart';

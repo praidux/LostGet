@@ -16,8 +16,7 @@ import '../../../widgets/authentication_widget.dart';
 
 class EmailVerification extends StatefulWidget {
   static const routeName = '/email_verification';
-  final UserCredential userCredential;
-  const EmailVerification({super.key, required this.userCredential});
+  const EmailVerification({super.key});
 
   @override
   State<EmailVerification> createState() => _EmailVerificationState();
@@ -26,8 +25,9 @@ class EmailVerification extends StatefulWidget {
 class _EmailVerificationState extends State<EmailVerification> {
   int _remainingSeconds = 0;
   late Timer _timer;
-  EmailVerificationBloc emailVerificationBloc = EmailVerificationBloc();
-  late bool isUserVerified;
+  final EmailVerificationBloc _emailVerificationBloc = EmailVerificationBloc();
+
+  final User? _userCredential = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
@@ -35,7 +35,7 @@ class _EmailVerificationState extends State<EmailVerification> {
       await FirebaseAuth.instance.currentUser?.reload();
       final user = FirebaseAuth.instance.currentUser;
       if (user?.emailVerified ?? false) {
-        emailVerificationBloc.add(EmailVerifiedEvent());
+        _emailVerificationBloc.add(EmailVerifiedEvent());
         timer.cancel();
       }
     });
@@ -47,7 +47,7 @@ class _EmailVerificationState extends State<EmailVerification> {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_remainingSeconds > 0) {
         _remainingSeconds--;
-        emailVerificationBloc.add(CountDownTimerEvent(_remainingSeconds));
+        _emailVerificationBloc.add(CountDownTimerEvent(_remainingSeconds));
       } else {
         timer.cancel();
       }
@@ -61,17 +61,16 @@ class _EmailVerificationState extends State<EmailVerification> {
   }
 
   Future<void> handleButton() async {
-    // emailVerificationBloc.add(ResendVerificationEmailClickedEvent());
     _remainingSeconds = 30;
-    // await widget.userCredential.user!.sendEmailVerification();
-
     startCountdown();
+    _emailVerificationBloc.add(ResendVerificationEmailClickedEvent());
+    await _userCredential!.sendEmailVerification();
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocListener<EmailVerificationBloc, EmailVerificationState>(
-      bloc: emailVerificationBloc,
+      bloc: _emailVerificationBloc,
       listener: (context, state) {
         if (state is ResendVerificationEmailClickedState) {
           createToast(
@@ -111,7 +110,7 @@ class _EmailVerificationState extends State<EmailVerification> {
                     style: Theme.of(context).textTheme.bodySmall,
                     children: [
                       TextSpan(
-                          text: "${widget.userCredential.user!.email}. ",
+                          text: "${_userCredential!.email}. ",
                           style: const TextStyle(fontWeight: FontWeight.bold)),
                       const TextSpan(
                           text:
@@ -129,7 +128,7 @@ class _EmailVerificationState extends State<EmailVerification> {
                 height: 8.h,
               ),
               BlocBuilder<EmailVerificationBloc, EmailVerificationState>(
-                bloc: emailVerificationBloc,
+                bloc: _emailVerificationBloc,
                 builder: (context, state) {
                   if (state is CountDownTimerState &&
                       state.remainingSeconds > 0) {

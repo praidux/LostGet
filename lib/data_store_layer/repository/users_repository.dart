@@ -51,7 +51,7 @@ class UserRepository extends BaseUsersRepository {
 
     // Get the download URL of the uploaded image
     String downloadUrl = await taskSnapshot.ref.getDownloadURL();
-    print("Url is $downloadUrl");
+  
     return downloadUrl;
   }
 
@@ -59,31 +59,11 @@ class UserRepository extends BaseUsersRepository {
     final snapshot =
         await _firebaseFirestore.collection('users').doc(uid).get();
     final data = snapshot.data();
-    print("null");
+   
     return data == null ? true : false;
   }
 
-  // Future<UserCredential> signInGoogle() async {
-  //   // Trigger the authentication flow
-  //   final GoogleSignInAccount? googleUser = await GoogleSignIn()
-  //       .signIn()
-  //       .onError(
-  //           (error, stackTrace) => createToast(description: "Error occurred"));
-
-  //   // Obtain the auth details from the request
-  //   final GoogleSignInAuthentication? googleAuth =
-  //       await googleUser?.authentication;
-
-  //   // Create a new credential
-  //   final credential = GoogleAuthProvider.credential(
-  //     accessToken: googleAuth?.accessToken,
-  //     idToken: googleAuth?.idToken,
-  //   );
-
-  //   // Once signed in, return the UserCredential
-  //   return await FirebaseAuth.instance.signInWithCredential(credential);
-  // }
-
+  
   Future<UserCredential> signInWithGoogle() async {
     // Trigger the authentication flow
 

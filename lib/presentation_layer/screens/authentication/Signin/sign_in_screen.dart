@@ -7,10 +7,10 @@ import 'package:lost_get/presentation_layer/screens/Authentication/SignUp/sign_u
 import 'package:lost_get/presentation_layer/widgets/button.dart';
 import 'package:lost_get/presentation_layer/widgets/password_field.dart';
 import 'package:lost_get/presentation_layer/widgets/toast.dart';
-
 import '../../../../business_logic_layer/Authentication/Signin/bloc/sign_in_bloc.dart';
 import '../../../widgets/authentication_widget.dart';
-import '../../../widgets/please_wait.dart';
+import '../../../widgets/controller_validators.dart';
+import '../../../widgets/custom_dialog.dart';
 import '../../../widgets/text_field.dart';
 import '../../Dashboard/dashboard_screen.dart';
 
@@ -28,41 +28,21 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailAddressController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   int loginButtonClickCount = 0;
-  OverlayEntry? overlayEntry;
 
-  void _handleLogin() {
+  void _handleLoginForSocialMedia(String type) {
+    SignInController().handleSignIn(context, type, signinBloc,
+        _emailAddressController, _passwordController);
+  }
+
+  void _handleLoginForEmail() {
     try {
       if (formKey.currentState!.validate()) {
-        print("validated");
-        // Form is valid, proceed with submission
         loginButtonClickCount++;
-        SignInController().handleSignIn(context, 'email', signinBloc);
+        SignInController().handleSignIn(context, 'email', signinBloc,
+            _emailAddressController, _passwordController);
       }
-    } catch (e) {}
-  }
-
-  void showCustomLoadingDialog(BuildContext context) {
-    overlayEntry = OverlayEntry(
-      builder: (BuildContext context) {
-        return Positioned.fill(
-          child: Container(
-            color: Colors.transparent
-                .withOpacity(0.7), // Make the overlay transparent
-            child: const Center(
-              child: PleaseWaitDialog(description: "Logging in..."),
-            ),
-          ),
-        );
-      },
-    );
-
-    Overlay.of(context).insert(overlayEntry!);
-  }
-
-  void hideCustomLoadingDialog(BuildContext context) {
-    if (overlayEntry != null) {
-      overlayEntry!.remove();
-      overlayEntry = null;
+    } catch (e) {
+      signinBloc.add(LoginButtonErrorEvent("Can't Login, Please try again!"));
     }
   }
 
@@ -76,7 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
         }
 
         if (state is LoginButtonLoadingState) {
-          showCustomLoadingDialog(context);
+          showCustomLoadingDialog(context, "Logging In...");
         }
         if (state is LoginButtonSuccessState) {
           hideCustomLoadingDialog(context);
@@ -102,123 +82,30 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(
                         height: 18.h,
                       ),
-                      Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Email',
-                              style: Theme.of(context).textTheme.titleSmall,
-                            ),
-                            const SizedBox(
-                              height: 6,
-                            ),
-                            SizedBox(
-                              width: MediaQuery.sizeOf(context).width,
-                              child: TextFormField(
-                                controller: _emailAddressController,
-                                onChanged: (value) {
-                                  // textOnChanged(value);
-                                },
-                                validator: (value) {
-                                  if (value!.isEmpty ||
-                                      !RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$')
-                                          .hasMatch(value)) {
-                                    print("here");
-                                    return 'Email is not correct';
-                                  } else {
-                                    return null;
-                                  }
-                                },
-                                style: Theme.of(context).textTheme.bodySmall,
-                                keyboardType: TextInputType.emailAddress,
-                                decoration: InputDecoration(
-                                  prefixIcon: IconButton(
-                                    onPressed: () {},
-                                    icon: SvgPicture.asset(
-                                      'assets/icons/mail.svg',
-                                      height: 10.h,
-                                      width: 10.w,
-                                    ),
-                                  ),
-                                  border: const OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(4))),
-                                  hintText: 'Your Email',
-                                  hintStyle:
-                                      Theme.of(context).textTheme.bodySmall,
-                                ),
-                              ),
-                            )
-                          ]),
+                      InputTextField(
+                          controller: _emailAddressController,
+                          textHint: "Your Email Address",
+                          title: "Email",
+                          imageUrl: 'assets/icons/mail.svg',
+                          validatorFunction: (value) =>
+                              ControllerValidator.validateEmailAddress(value)),
                       SizedBox(
                         height: 9.h,
                       ),
                       BlocBuilder<SignInBloc, SignInState>(
                         bloc: signinBloc,
                         builder: (context, state) {
-                          return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Password",
-                                  style: Theme.of(context).textTheme.titleSmall,
-                                ),
-                                const SizedBox(
-                                  height: 6,
-                                ),
-                                SizedBox(
-                                  width: MediaQuery.sizeOf(context).width,
-                                  child: TextFormField(
-                                    validator: (value) {
-                                      if (value!.isEmpty) {
-                                        return 'Password field is empty';
-                                      }
-                                    },
-                                    controller: _passwordController,
-                                    style:
-                                        Theme.of(context).textTheme.bodySmall,
-                                    keyboardType: TextInputType.emailAddress,
-                                    onChanged: (password) {},
-                                    decoration: InputDecoration(
-                                      prefixIcon: IconButton(
-                                        onPressed: () {},
-                                        icon: SvgPicture.asset(
-                                          'assets/icons/lock.svg',
-                                          height: 10.h,
-                                          width: 10.w,
-                                        ),
-                                      ),
-
-                                      border: const OutlineInputBorder(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(4))),
-                                      hintText: 'Your Password',
-
-                                      hintStyle:
-                                          Theme.of(context).textTheme.bodySmall,
-                                      suffixIcon: IconButton(
-                                          onPressed: () {
-                                            signinBloc.add(
-                                                EyeToggleViewClickedEvent());
-                                          },
-                                          icon: state.isHidden
-                                              ? SvgPicture.asset(
-                                                  'assets/icons/eye-off.svg',
-                                                  height: 10.h,
-                                                  width: 10.w,
-                                                )
-                                              : SvgPicture.asset(
-                                                  'assets/icons/eye-on.svg',
-                                                  height: 10.h,
-                                                  width: 10.w,
-                                                )),
-
-                                      // floatingLabelBehavior: FloatingLabelBehavior.never,
-                                    ),
-                                    obscureText: state.isHidden,
-                                  ),
-                                )
-                              ]);
+                          return PasswordField(
+                              textHint: "Enter Password",
+                              title: "Password",
+                              imageUrl: 'assets/icons/lock.svg',
+                              isHidden: state.isHidden,
+                              toggleEye: () {
+                                signinBloc.add(EyeToggleViewClickedEvent());
+                              },
+                              controller: _passwordController,
+                              handleValidator: (value) => ControllerValidator
+                                  .validateLogInPasswordField(value));
                         },
                       ),
                       SizedBox(
@@ -230,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       CreateButton(
                         title: 'Login',
-                        handleButton: _handleLogin,
+                        handleButton: () => _handleLoginForEmail(),
                       ),
                       SizedBox(
                         height: 29.h,
@@ -267,14 +154,16 @@ class _LoginScreenState extends State<LoginScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             InkWell(
+                                onTap: () =>
+                                    _handleLoginForSocialMedia('facebook'),
                                 child: SvgPicture.asset(
                                     'assets/icons/facebook_logo.svg')),
                             SizedBox(
                               width: 10.w,
                             ),
                             InkWell(
-                                onTap: () => SignInController().handleSignIn(
-                                    context, 'google', signinBloc),
+                                onTap: () =>
+                                    _handleLoginForSocialMedia('google'),
                                 child: SvgPicture.asset(
                                     'assets/icons/google_logo.svg')),
                           ],

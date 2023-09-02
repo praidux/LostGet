@@ -7,6 +7,7 @@ import '../../common/constants/constant.dart';
 
 Future<void> alertDialog(context, String msg, String title, String actionOne,
     String actionTwo, Function noFunction, Function yesFunction) {
+      // provider = 
   return Dialogs.materialDialog(
       context: context,
       msg: msg,

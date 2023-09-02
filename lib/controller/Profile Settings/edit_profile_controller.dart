@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../../business_logic_layer/EditProfile/ChangeProfile/bloc/change_profile_bloc.dart';
 import '../../business_logic_layer/EditProfile/bloc/edit_profile_bloc.dart';
