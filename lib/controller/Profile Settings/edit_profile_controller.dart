@@ -26,8 +26,8 @@ class EditProfileController {
     final String biography = newProfileData['biography'];
     final String gender = newProfileData['gender'];
     final String dateOfBirth = newProfileData['dateOfBirth'];
-    final String email = newProfileData['email'];
-    var phoneNumber = newProfileData['phoneNumber'];
+    // final String email = newProfileData['email'];
+    // var phoneNumber = newProfileData['phoneNumber'];
     var imgUrl = newProfileData['imgUrl'];
 
     Map<String, dynamic> newMap = {};
@@ -42,20 +42,21 @@ class EditProfileController {
       newMap['biography'] = biography;
     }
 
-    if (oldProfileData.dateOfBirth != dateOfBirth) {
+    if (oldProfileData.dateOfBirth != dateOfBirth &&
+        oldProfileData.dateOfBirth != "DD/MM/YYYY") {
       print("3");
       newMap['dateOfBirth'] = dateOfBirth;
     }
 
-    if (oldProfileData.email != email) {
-      print("4");
-      newMap['email'] = email;
-    }
+    // if (oldProfileData.email != email) {
+    //   print("4");
+    //   newMap['email'] = email;
+    // }
 
-    if (oldProfileData.phoneNumber != phoneNumber && phoneNumber != null) {
-      print("5");
-      newMap['phoneNumber'] = phoneNumber;
-    }
+    // if (oldProfileData.phoneNumber != phoneNumber && phoneNumber != null) {
+    //   print("5");
+    //   newMap['phoneNumber'] = phoneNumber;
+    // }
 
     if (oldProfileData.gender != gender) {
       print("6");

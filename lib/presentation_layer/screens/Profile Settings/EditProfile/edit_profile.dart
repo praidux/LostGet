@@ -19,6 +19,7 @@ import '../../../../business_logic_layer/EditProfile/ChangeProfile/bloc/change_p
 import '../../../../business_logic_layer/EditProfile/bloc/edit_profile_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import '../../../widgets/alert_dialog.dart';
+import '../../../widgets/controller_validators.dart';
 import '../../../widgets/please_wait.dart';
 
 class EditProfile extends StatefulWidget {
@@ -170,7 +171,6 @@ class _EditProfileState extends State<EditProfile> {
                                 createToast(description: state.errorMsg);
                               }
                               if (state is ChangeProfileLoadedState) {
-                              
                                 _pickedImage = state.pickedImage;
 
                                 return Stack(children: [
@@ -267,10 +267,9 @@ class _EditProfileState extends State<EditProfile> {
                           height: 11.h,
                         ),
                         createProfileFields(context, 'Bio', TextInputType.text,
-                            _biographyController, (value) {}
-                            // editProfileBloc
-                            // .add(BiographyOnChangedEvent(bio))
-                            ),
+                            _biographyController, (value) {
+                          return null;
+                        }, true),
                         SizedBox(
                           height: 4.h,
                         ),
@@ -353,13 +352,14 @@ class _EditProfileState extends State<EditProfile> {
                           height: 3.h,
                         ),
                         createProfileFields(
-                            context,
-                            'Email Address',
-                            TextInputType.emailAddress,
-                            _emailAddressController, (email) {
-                          // editProfileBloc.add(EmailOnChangedEvent(email)
-                          // );
-                        }),
+                          context,
+                          'Email Address',
+                          TextInputType.emailAddress,
+                          _emailAddressController,
+                          (value) =>
+                              ControllerValidator.validateEmailAddress(value!),
+                          false,
+                        ),
                         SizedBox(
                           height: 3.h,
                         ),
@@ -371,6 +371,7 @@ class _EditProfileState extends State<EditProfile> {
                               height: 3.h,
                             ),
                             IntlPhoneField(
+                              enabled: false,
                               controller: _phoneNumberController,
                               onChanged: (value) =>
                                   _completePhoneNumber = value.completeNumber,
@@ -391,9 +392,10 @@ class _EditProfileState extends State<EditProfile> {
                               height: 8.h,
                             ),
                             CreateButton(
-                                title: 'Save',
-                                handleButton: () async {
-                              
+                              title: 'Save',
+                              handleButton: () async {
+                                if (formKey.currentState!.validate()) {
+                                  print("inside of it");
                                   Map<String, dynamic> newProfileData = {
                                     "fullName": _fullNameController.text,
                                     "biography": _biographyController.text,
@@ -412,13 +414,13 @@ class _EditProfileState extends State<EditProfile> {
                                     _pickedImage = null;
                                   }
 
-                                  if (_completePhoneNumber != null) {
-                                    newProfileData['phoneNumber'] =
-                                        _completePhoneNumber;
-                                  }
+                                  // if (_completePhoneNumber != null) {
+                                  //   newProfileData['phoneNumber'] =
+                                  //       _completePhoneNumber;
+                                  // }
 
                                   if (_genderController.dropDownValue?.name !=
-                                          null ||
+                                          null &&
                                       _genderController.dropDownValue?.name !=
                                           "") {
                                     newProfileData["gender"] =
@@ -432,7 +434,9 @@ class _EditProfileState extends State<EditProfile> {
                                       newProfileData,
                                       state.userProfile,
                                       changeProfileBloc));
-                                }),
+                                }
+                              },
+                            ),
                           ],
                         ),
                       ]),
@@ -494,7 +498,6 @@ class _EditProfileState extends State<EditProfile> {
     if (userProfile.dateOfBirth != "" && userProfile.dateOfBirth != null) {
       _dateOfBirthController.text = userProfile.dateOfBirth!;
     } else {
-   
       _dateOfBirthController.text = "DD/MM/YYYY";
     }
 
@@ -542,8 +545,9 @@ Widget createBioFields(context, EditProfileBloc editProfileBloc,
       ),
       SizedBox(
         width: 200.w,
-        height: 20.h,
-        child: TextField(
+        child: TextFormField(
+          validator: (value) =>
+              ControllerValidator.validateFullNameField(value!),
           controller: textEditingController,
           textAlign: TextAlign.start,
           onChanged: (fullName) {
@@ -564,8 +568,13 @@ Widget createBioFields(context, EditProfileBloc editProfileBloc,
   );
 }
 
-Widget createProfileFields(context, String title, TextInputType textInputType,
-    TextEditingController textEditingController, Function handleOnChange) {
+Widget createProfileFields(
+    context,
+    String title,
+    TextInputType textInputType,
+    TextEditingController textEditingController,
+    Function(String?) validatorFunction,
+    bool enable) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -576,24 +585,22 @@ Widget createProfileFields(context, String title, TextInputType textInputType,
       SizedBox(
         height: 3.h,
       ),
-      SizedBox(
-        height: 20.h,
-        child: TextField(
-          controller: textEditingController,
-          textAlign: TextAlign.start,
-          onChanged: (value) {
-            handleOnChange(value);
-          },
-          style: Theme.of(context).textTheme.bodySmall,
-          keyboardType: textInputType,
-          decoration: const InputDecoration(
-            contentPadding: EdgeInsets.symmetric(vertical: 7, horizontal: 12),
+      TextFormField(
+        enabled: enable,
+        controller: textEditingController,
+        validator: (value) {
+          return validatorFunction(value);
+        },
+        textAlign: TextAlign.start,
+        style: Theme.of(context).textTheme.bodySmall,
+        keyboardType: textInputType,
+        decoration: const InputDecoration(
+          contentPadding: EdgeInsets.symmetric(vertical: 7, horizontal: 12),
 
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5))),
+          border: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(5))),
 
-            // floatingLabelBehavior: FloatingLabelBehavior.never,
-          ),
+          // floatingLabelBehavior: FloatingLabelBehavior.never,
         ),
       ),
     ],

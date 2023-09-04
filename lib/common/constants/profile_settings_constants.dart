@@ -63,7 +63,8 @@ class ProfileSettingsConstants {
       {
         'title': "Manage Account",
         'subtitle': "Manage your personal details.",
-        'handleFunction': () {}
+        'handleFunction': () =>
+            settingsBloc!.add(ManageAccountButtonClickedEvent())
       },
       {
         'title': "User Preference",

@@ -9,6 +9,10 @@ sealed class SettingsState extends Equatable {
 
 final class SettingsInitial extends SettingsState {}
 
-final class UserPreferenceButtonClickedState extends SettingsState {}
+final class SettingsActionState extends SettingsState {}
 
-final class ReleasedButtonState extends SettingsState {}
+final class UserPreferenceButtonClickedState extends SettingsActionState {}
+
+final class ReleasedButtonState extends SettingsActionState {}
+
+final class ManageAccountButtonClickedState extends SettingsActionState {}

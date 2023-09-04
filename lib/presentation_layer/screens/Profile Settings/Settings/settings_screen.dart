@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../business_logic_layer/ProfileSettings/Settings/bloc/settings_bloc.dart';
 import '../../../../business_logic_layer/Provider/change_theme_mode.dart';
+import 'ManageAccount/manage_account.dart';
 
 class EditProfileSettings extends StatefulWidget {
   const EditProfileSettings({super.key});
@@ -40,9 +41,15 @@ class _EditProfileSettingsState extends State<EditProfileSettings> {
         ),
         body: BlocListener<SettingsBloc, SettingsState>(
           bloc: settingsBloc,
+          listenWhen: (previous, current) => current is SettingsActionState,
           listener: (context, state) {
             if (state is UserPreferenceButtonClickedState) {
               Navigator.pushNamed(context, UserPreferenceScreen.routeName);
+              settingsBloc.add(ReleasedButtonEvent());
+            }
+
+            if (state is ManageAccountButtonClickedState) {
+              Navigator.pushNamed(context, ManageAccount.routeName);
               settingsBloc.add(ReleasedButtonEvent());
             }
           },

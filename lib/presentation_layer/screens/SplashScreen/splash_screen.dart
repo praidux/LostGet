@@ -10,7 +10,6 @@ import '../../../common/constants/colors.dart';
 import '../../../common/global.dart';
 import '../../../controller/Authentication/sign_in_controller.dart';
 import '../Authentication/Signin/sign_in_screen.dart';
-import '../Home/home_screen.dart';
 import '../Onboarding/onboard_screen.dart';
 
 class SplashScreen extends StatefulWidget {

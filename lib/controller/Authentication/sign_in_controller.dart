@@ -205,4 +205,14 @@ class SignInController {
 
     return false;
   }
+
+  Future<String> resetEmail(String newEmail) async {
+    String message = '';
+    User? firebaseuser = FirebaseAuth.instance.currentUser;
+    firebaseuser
+        ?.updateEmail(newEmail)
+        .then((value) => message = 'success')
+        .catchError((onerror) => message = 'error');
+    return message;
+  }
 }

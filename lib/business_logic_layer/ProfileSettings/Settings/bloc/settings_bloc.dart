@@ -10,6 +10,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   SettingsBloc() : super(SettingsInitial()) {
     on<UserPreferenceButtonClickedEvent>(userPreferenceButtonClickedEvent);
     on<ReleasedButtonEvent>(releasedButtonEvent);
+    on<ManageAccountButtonClickedEvent>(manageAccountButtonClickedEvent);
   }
 
   FutureOr<void> userPreferenceButtonClickedEvent(
@@ -20,5 +21,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   FutureOr<void> releasedButtonEvent(
       ReleasedButtonEvent event, Emitter<SettingsState> emit) {
     emit(ReleasedButtonState());
+  }
+
+  FutureOr<void> manageAccountButtonClickedEvent(
+      ManageAccountButtonClickedEvent event, Emitter<SettingsState> emit) {
+    emit(ManageAccountButtonClickedState());
   }
 }

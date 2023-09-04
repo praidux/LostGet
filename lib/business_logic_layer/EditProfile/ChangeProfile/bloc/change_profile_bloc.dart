@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -17,8 +18,14 @@ class ChangeProfileBloc extends Bloc<ChangeProfileEvent, ChangeProfileState> {
       XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
       if (image != null) {
-        print("Image is her ${image.name}");
-        emit(ChangeProfileLoadedState(image));
+        final File storedImage = File(image.path);
+        final bytes = storedImage.readAsBytesSync().lengthInBytes;
+        final kb = bytes / 1024;
+        if (kb > 1024) {
+          emit(const ChangeProfileErrorState("Image must be less than 1 Mb"));
+        } else {
+          emit(ChangeProfileLoadedState(image));
+        }
       } else {
         emit(const ChangeProfileErrorState("Error Occurred"));
       }

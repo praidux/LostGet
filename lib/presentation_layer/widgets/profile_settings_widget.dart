@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 
-
-Widget createListTile(context, String title, String subtitle,
+Widget createListTile(context, String title, String? subtitle,
     String? leadingIcon, Function handleFunction, bool isDark) {
   ColorFilter? colorFilter =
       isDark ? const ColorFilter.mode(Colors.white, BlendMode.srcIn) : null;
@@ -19,10 +18,12 @@ Widget createListTile(context, String title, String subtitle,
           title,
           style: Theme.of(context).textTheme.titleSmall,
         ),
-        subtitle: Text(
-          subtitle,
-          style: Theme.of(context).textTheme.displaySmall,
-        ),
+        subtitle: subtitle != null
+            ? Text(
+                subtitle,
+                style: Theme.of(context).textTheme.displaySmall,
+              )
+            : null,
         trailing: SizedBox(
             child: SvgPicture.asset(
           'assets/icons/arrow-right.svg',

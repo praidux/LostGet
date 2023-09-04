@@ -5,6 +5,8 @@ import 'package:lost_get/business_logic_layer/Dashboard/bloc/dashboard_bloc.dart
 import 'package:lost_get/business_logic_layer/EditProfile/ChangeProfile/bloc/change_profile_bloc.dart';
 import 'package:lost_get/business_logic_layer/EditProfile/bloc/edit_profile_bloc.dart';
 import 'package:lost_get/business_logic_layer/Onboard/bloc/onboard_bloc.dart';
+import 'package:lost_get/business_logic_layer/ProfileSettings/Settings/ManageAccount/ChangePhoneNumber/bloc/change_phone_number_bloc.dart';
+import 'package:lost_get/business_logic_layer/ProfileSettings/Settings/ManageAccount/bloc/manage_account_bloc.dart';
 import 'package:lost_get/business_logic_layer/ProfileSettings/Settings/bloc/settings_bloc.dart';
 import 'package:lost_get/business_logic_layer/ProfileSettings/UserPreference/bloc/user_preference_bloc.dart';
 import 'package:lost_get/business_logic_layer/ProfileSettings/bloc/profile_settings_bloc.dart';
@@ -26,7 +28,9 @@ class AppBlocProvider {
         BlocProvider(create: (_) => ChangeProfileBloc()),
         BlocProvider(create: (_) => UserPreferenceBloc()),
         BlocProvider(create: (_) => SettingsBloc()),
+        BlocProvider(create: (_) => ManageAccountBloc()),
+        BlocProvider(create: (_) => ChangePhoneNumberBloc()),
         ChangeNotifierProvider(create: (_) => PasswordStrengthProvider()),
-        ChangeNotifierProvider(create: (context) => ChangeThemeMode())
+        ChangeNotifierProvider(create: (_) => ChangeThemeMode())
       ];
 }

@@ -10,3 +10,5 @@ sealed class SettingsEvent extends Equatable {
 final class UserPreferenceButtonClickedEvent extends SettingsEvent {}
 
 final class ReleasedButtonEvent extends SettingsEvent {}
+
+final class ManageAccountButtonClickedEvent extends SettingsEvent {}

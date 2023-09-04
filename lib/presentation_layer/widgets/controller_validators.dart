@@ -21,9 +21,9 @@ class ControllerValidator {
     bool hasNumbers = RegExp(r'[0-9]').hasMatch(value);
 
     if (hasNumbers) {
-      return 'Full Name field can\'t contain numbers';
+      return 'Name can\'t contain numbers';
     } else if (!hasThreeOrMoreLowercase) {
-      return 'Full Name must contain 3 characters';
+      return 'Name must contain 3 characters';
     }
     return null;
   }
